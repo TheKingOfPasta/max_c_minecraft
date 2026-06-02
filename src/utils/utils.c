@@ -194,7 +194,7 @@ char* read_shader(char* file)
                     "optionNV(fastmath on)\n#pragma optionNV(fastprecision on)\n#pragma "
                     "optionNV(unroll all)\n#pragma optimize(on)\n\n";
 
-    char* bindings = read_all_file("src/opengl/headers.h");
+    char* bindings = read_all_file("src/headers.h");
     char* f = read_all_file(file);
     char* config = read_all_file("shaders/headers.glsl");
     char* f_cpy = read_shader_includes(file);

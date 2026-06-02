@@ -17,18 +17,18 @@
 
 #define VEC3_ADD_INPLACE(A, B)                                                                     \
     {                                                                                              \
-        A.x += B.x;                                                                                \
-        A.y += B.y;                                                                                \
-        A.z += B.z;                                                                                \
+        (A)->x += B.x;                                                                                \
+        (A)->y += B.y;                                                                                \
+        (A)->z += B.z;                                                                                \
     }
 
 #define VEC3_SUB(A, B) ((typeof(A)){ .x = A.x - B.x, .y = A.y - B.y, .z = A.z - B.z })
 
 #define VEC3_SUB_INPLACE(A, B)                                                                     \
     {                                                                                              \
-        A.x -= B.x;                                                                                \
-        A.y -= B.y;                                                                                \
-        A.z -= B.z;                                                                                \
+        (A)->x -= B.x;                                                                                \
+        (A)->y -= B.y;                                                                                \
+        (A)->z -= B.z;                                                                                \
     }
 
 #define VEC3_MOD(A, K) ((typeof(A)){ .x = A.x % B.x, .y = A.y % B.y, .z = A.z % B.z })

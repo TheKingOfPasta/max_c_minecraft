@@ -12,6 +12,8 @@ typedef struct
 
     GLuint simulation_ubo;
 
+    float padding;
+
     VEC3(float) cam_pos;
     float cam_pitch;
     float cam_yaw;
