@@ -10,12 +10,9 @@ typedef struct
 {
     float dt;
 
-    GLuint config_ubo;
     GLuint simulation_ubo;
 
-    float padding;
-
-    Vec3 cam_pos;
+    VEC3(float) cam_pos;
     float cam_pitch;
     float cam_yaw;
 } shader_simulation;

@@ -1,15 +1,17 @@
 #pragma once
 
+#include <stdint.h>
+
 #define VEC3(T)                                     \
     vec3_##T
 
-#define DECLARE_VEC3(T)                             \
+#define VEC3_DECLARE(T)                             \
     typedef struct                                  \
     {                                               \
         T x;                                        \
         T y;                                        \
         T z;                                        \
-    } VEC3(T);
+    } VEC3(T)
 
 #define VEC3_ADD(A, B)                              \
     ((typeof(A)){ .x = A.x+B.x, .y = A.y+B.y, .z = A.z+B.z })
@@ -50,3 +52,8 @@
 #define VEC3_CAST(A, OTHERTYPE)
 
 #define VEC3_MAP(A, OTHERTYPE, e, body)
+
+VEC3_DECLARE(float);
+VEC3_DECLARE(int32_t);
+VEC3_DECLARE(uint32_t);
+VEC3_DECLARE(uint8_t);
