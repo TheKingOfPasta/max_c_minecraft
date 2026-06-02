@@ -15,7 +15,7 @@ LDFLAGS += $(shell pkg-config --libs glfw3)
 SRC=$(shell find src -name "*.c")
 OBJ=$(SRC:.c=.o)
 
-TARGET=c_water
+TARGET=max_c_minecraft
 
 src/glad.o: src/glad.c
 	$(CC) $(CFLAGS) -Wno-pedantic -c $< -o $@

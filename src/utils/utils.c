@@ -5,52 +5,33 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern TimingSlot* __start_timing_ptrs[];
-extern TimingSlot* __stop_timing_ptrs[];
-
-void timing_frame_start(void)
-{
-    for (TimingSlot** sp = __start_timing_ptrs; sp < __stop_timing_ptrs; sp++)
-        (*sp)->ran = 0;
-}
-
-void print_timings_dashboard(double fps)
-{
-    TimingSlot** begin = __start_timing_ptrs;
-    TimingSlot** end   = __stop_timing_ptrs;
-    int          count = (int)(end - begin) + 1;
-
-    static int initialized = 0;
-    if (!initialized)
-    {
-        for (int i = 0; i < count + 1; i++)
-            printf("\n");
-        initialized = 1;
-    }
-
-    printf("\033[%dA", count + 1);
-
-    for (TimingSlot** sp = end - 1; sp >= begin; sp--)
-    {
-        TimingSlot* s = *sp;
-        if (s->ran)
-            printf("\r\033[K  %-22s %.3f ms\n", s->name, s->ms);
-        else
-            printf("\r\033[K  %-22s ---\n", s->name);
-    }
-
-    printf("\r\033[K  FPS: %.1f", fps);
-}
-
 #include "headers.h"
 #include "utils/utils.h"
 
-void opengl_add_config(GLuint program, shader_simulation* s)
+char* read_all_file(char* file)
 {
-    glUniform1ui(glGetUniformLocation(program, "NB_PARTICLES"), NB_PARTICLES);
+    FILE* f = fopen(file, "r");
+    if (f == NULL)
+    {
+        printf("%s does not exist\n", file);
+        exit(1);
+    }
 
-    glBindBuffer(GL_UNIFORM_BUFFER, s->config_ubo);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(config), c);
+    fseek(f, 0, SEEK_END);
+    int eof = ftell(f);
+    rewind(f);
+
+    char* res = calloc(eof + 1, sizeof(char));
+
+    fread(res, eof, sizeof(char), f);
+
+    fclose(f);
+
+    return res;
+}
+
+void opengl_add_config(shader_simulation* s)
+{
     glBindBuffer(GL_UNIFORM_BUFFER, s->simulation_ubo);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(shader_simulation), s);
 }
@@ -77,7 +58,7 @@ void bind_uniform_buffer(GLuint* ubo, GLuint binding, void* ptr, size_t elt_size
 void opengl_prepare_program(GLuint program, shader_simulation* s)
 {
     glUseProgram(program);
-    opengl_add_config(program, s);
+    opengl_add_config(s);
 }
 
 void opengl_launch_last_prepared_program(size_t elt_count)
@@ -249,8 +230,7 @@ GLFWwindow* init_window()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* win = glfwCreateWindow(c->static_config.screen_width,
-                                       c->static_config.screen_height, "C Water", NULL, NULL);
+    GLFWwindow* win = glfwCreateWindow(1920, 1080, "Max C Minecraft", NULL, NULL);
 
     glfwMakeContextCurrent(win);
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

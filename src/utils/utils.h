@@ -7,7 +7,9 @@
 
 #include "shader_simulation.h"
 
-void opengl_add_config(GLuint program, shader_simulation* s);
+char* read_all_file(char *file);
+
+void opengl_add_config(shader_simulation* s);
 GLuint opengl_add_array(void* array, int size, int index);
 void opengl_prepare_program(GLuint program, shader_simulation* s);
 void opengl_launch_last_prepared_program(size_t elt_count);
@@ -22,19 +24,6 @@ char* read_shader(char* file);
 GLFWwindow* init_window();
 
 #define ENABLE_PRINTS true
-
-typedef struct
-{
-    const char* name;
-    double ms;
-    int ran;
-} TimingSlot;
-
-void timing_frame_start(void);
-void print_timings_dashboard(double fps);
-
-#define TIMINGS_FRAME_START() timing_frame_start()
-#define PRINT_TIMINGS(fps) print_timings_dashboard(fps)
 
 #if ENABLE_PRINTS == true
 
