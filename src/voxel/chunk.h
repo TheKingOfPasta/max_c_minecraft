@@ -11,7 +11,7 @@ typedef struct
     int64_t x;
     int64_t y;
 
-    block blocks[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
-} chunk;
+    Block blocks[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
+} Chunk;
 
-chunk create_random_chunk(int64_t x, int64_t y);
+Chunk create_random_chunk(int64_t x, int64_t y);
