@@ -20,7 +20,7 @@
 #    define WIN_H 1080
 #endif
 #define CAM_PITCH_LIMIT 1.55334f
-#define CAM_SPEED 150.0f
+#define CAM_SPEED 5.0f
 #define CAM_SENSITIVITY 0.0025f
 #define FOV_Y (3.14159265f / 2.0f)
 
