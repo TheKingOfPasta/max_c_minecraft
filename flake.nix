@@ -17,6 +17,8 @@
         pkgs.pkg-config
         pkgs.mesa
         pkgs.shaderc
+
+        pkgs.ccache
       ];
 
       shellHook = ''

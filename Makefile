@@ -1,4 +1,5 @@
-CC=gcc
+CC=ccache gcc
+
 CFLAGS += -Wall -Wextra -Werror -Wvla -pedantic -Wswitch
 CFLAGS += -Wno-error=unused-variable -Wno-error=unused-result
 # CFLAGS += -fsanitize=address,undefined -g
