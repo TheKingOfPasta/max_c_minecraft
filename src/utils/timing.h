@@ -1,31 +1,16 @@
 #pragma once
 
 #include <glad/glad.h>
-// glad
-#include <GL/gl.h>
-#include <GLFW/glfw3.h>
 
-#include "shader_simulation.h"
+#define ENABLE_PRINTS 0
+#if ENABLE_PRINTS
 
-char* read_all_file(char *file);
-
-void opengl_add_config(shader_simulation* s);
-GLuint opengl_add_array(void* array, int size, int index);
-void opengl_prepare_program(GLuint program, shader_simulation* s);
-void opengl_launch_last_prepared_program(size_t elt_count);
-void opengl_launch_program(GLuint program, shader_simulation* s, size_t elt_count);
-void bind_uniform_buffer(GLuint* ubo, GLuint binding, void* ptr, size_t elt_size);
-
-GLuint create_compute_program(GLuint s, const char* src);
-GLuint compile_shader(GLenum type, char* file_name);
-GLuint create_program(GLuint s1, GLuint s2);
-char* read_shader_includes(char* file);
-char* read_shader(char* file);
-GLFWwindow* init_window();
-
-#define ENABLE_PRINTS false
-
-#if ENABLE_PRINTS == true
+typedef struct
+{
+    const char* name;
+    double ms;
+    int ran;
+} TimingSlot;
 
 #    define START_TIME(t)                                                                          \
         static TimingSlot _ts_##t = { .name = #t };                                                \

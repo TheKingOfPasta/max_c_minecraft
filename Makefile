@@ -17,10 +17,10 @@ OBJ=$(SRC:.c=.o)
 
 TARGET=max_c_minecraft
 
-src/glad.o: src/glad.c
-	$(CC) $(CFLAGS) -Wno-pedantic -c $< -o $@
-
 all: $(TARGET)
+
+src/glad/glad.o: src/glad/glad.c
+	$(CC) $(CFLAGS) -Wno-pedantic -c $< -o $@
 
 $(TARGET): $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
