@@ -1,3 +1,4 @@
+#pragma GCC diagnostic ignored "-Wpedantic"
 #include "block.h"
 
 #include "textures/base_texture_enum.h"
@@ -47,15 +48,12 @@
             .count = sizeof((FaceTextureBuilder[]){ __VA_ARGS__ }) / sizeof(FaceTextureBuilder),   \
         },                                                                                         \
     }
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
 const FaceTextureBuilder BlockFaceBuilders[][FACE_COUNT] = {
     [BLK_DIRT] = UNIFO(LEAF(TEX_DIRT)),
     [BLK_GRASS] = DONUT(LEAF(TEX_GRASS_SIDE), LEAF(TEX_GRASS), LEAF(TEX_DIRT)),
     [BLK_STONE] = UNIFO(LEAF(TEX_STONE)),
     [BLK_OAK] = BARREL(LEAF(TEX_OAK), LEAF(TEX_OAK_INNER)),
 };
-#pragma GCC diagnostic pop
 
 const int BlockFaceBuildersCount = (sizeof(BlockFaceBuilders) / sizeof(*BlockFaceBuilders));
 

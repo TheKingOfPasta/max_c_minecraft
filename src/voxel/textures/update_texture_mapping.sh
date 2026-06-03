@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ASSET_DIR="../../assets/block_textures"
+ASSET_DIR="../../../assets/block_textures"
 NAME="base_texture_enum"
 HEADER="$NAME.h"
 SOURCE="$NAME.c"

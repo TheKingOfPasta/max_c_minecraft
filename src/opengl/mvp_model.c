@@ -22,7 +22,7 @@ void mat4_perspective(mat4 m, float fov_y, float aspect, float znear, float zfar
     m[14] = -(2.0f * zfar * znear) / (zfar - znear);
 }
 
-void mat4_view_from_camera(mat4 m, float px, float py, float pz, float pitch, float yaw)
+void mat4_view_from_camera(mat4 m, VEC3(float) pos, float pitch, float yaw)
 {
     float cyaw = cosf(-yaw), syaw = sinf(-yaw);
     float cpitch = cosf(pitch), spitch = sinf(pitch);
@@ -34,15 +34,15 @@ void mat4_view_from_camera(mat4 m, float px, float py, float pz, float pitch, fl
     m[0] = rx;
     m[4] = ry;
     m[8] = rz;
-    m[12] = -(rx * px + ry * py + rz * pz);
+    m[12] = -(rx * pos.x + ry * pos.y + rz * pos.z);
     m[1] = ux;
     m[5] = uy;
     m[9] = uz;
-    m[13] = -(ux * px + uy * py + uz * pz);
+    m[13] = -(ux * pos.x + uy * pos.y + uz * pos.z);
     m[2] = -fx;
     m[6] = -fy;
     m[10] = -fz;
-    m[14] = fx * px + fy * py + fz * pz;
+    m[14] = fx * pos.x + fy * pos.y + fz * pos.z;
     m[3] = 0;
     m[7] = 0;
     m[11] = 0;
