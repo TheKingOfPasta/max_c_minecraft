@@ -1,4 +1,4 @@
-#include "shader_compil.h"
+#include "shader_compile.h"
 
 #include <stdio.h>
 #include <stdlib.h>

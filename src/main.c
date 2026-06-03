@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "mvp_model.h"
-#include "utils/shader_compil.h"
+#include "opengl/mvp_model.h"
+#include "opengl/shader_compile.h"
 #include "utils/vec3.h"
 
 #if defined(__NIXOS__)
