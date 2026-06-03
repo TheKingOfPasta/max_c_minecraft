@@ -142,7 +142,7 @@ void bind_uniform_buffer(GLuint* ubo, GLuint binding, void* ptr, size_t elt_size
     glBindBufferBase(GL_UNIFORM_BUFFER, binding, *ubo);
 }
 
-GLFWwindow* init_window(void)
+GLFWwindow* init_window(AppState* state)
 {
     if (!glfwInit())
     {
@@ -164,5 +164,12 @@ GLFWwindow* init_window(void)
     }
 
     glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    glfwSwapInterval(0);
+
+    glfwSetWindowUserPointer(win, state);
+    glfwSetKeyCallback(win, key_callback);
+    glfwSetCursorPosCallback(win, cursor_callback);
+
     return win;
 }
