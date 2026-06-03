@@ -9,6 +9,7 @@
 #include "opengl/mvp_model.h"
 #include "opengl/shader_compile.h"
 #include "utils/vec3.h"
+#include "voxel/textures/array_texture.h"
 
 #if defined(__NIXOS__)
 #    define WIN_W 1920
@@ -127,6 +128,11 @@ int main(void)
 
     GLuint cube_vao = create_cube_vao();
     GLuint fbo = create_fbo(WIN_W, WIN_H);
+
+    GLuint tex_array = load_block_texture_array();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, tex_array);
+
     glEnable(GL_DEPTH_TEST);
 
     GLuint mvp_ubo;
