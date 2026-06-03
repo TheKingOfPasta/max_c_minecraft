@@ -120,8 +120,8 @@ int main(void)
     glfwSetKeyCallback(win, key_callback);
     glfwSetCursorPosCallback(win, cursor_callback);
 
-    GLuint vs = compile_shader(GL_VERTEX_SHADER, "shaders/shader.vert");
-    GLuint fs = compile_shader(GL_FRAGMENT_SHADER, "shaders/shader.frag");
+    GLuint vs = compile_shader(GL_VERTEX_SHADER, "src/shaders/shader.vert");
+    GLuint fs = compile_shader(GL_FRAGMENT_SHADER, "src/shaders/shader.frag");
     GLuint render_prog = create_program(vs, fs);
 
     // clang-format off
