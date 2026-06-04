@@ -9,7 +9,7 @@
 #include "voxel/world.h"
 
 #define CAM_PITCH_LIMIT 1.55334f
-#define CAM_SPEED 5.0f
+#define CAM_SPEED 40.0f
 #define CAM_SENSITIVITY 0.0025f
 
 typedef struct AppState
@@ -23,6 +23,6 @@ typedef struct AppState
 } AppState;
 
 void key_callback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action,
-                         [[maybe_unused]] int mods);
+                  [[maybe_unused]] int mods);
 void cursor_callback(GLFWwindow* window, double xpos, double ypos);
 void update_camera(GLFWwindow* window, AppState* state, float dt);

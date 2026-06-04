@@ -3,7 +3,7 @@
 #include <math.h>
 
 void key_callback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action,
-                         [[maybe_unused]] int mods)
+                  [[maybe_unused]] int mods)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -46,8 +46,7 @@ void update_camera(GLFWwindow* window, AppState* state, float dt)
 
     float step = CAM_SPEED * dt;
 
-    VEC3(float)
-    fwd = { .x = -syaw * cpitch * step, .y = -spitch * step, .z = cyaw * cpitch * step };
+    VEC3(float) fwd = { -syaw * cpitch * step, -spitch * step, cyaw * cpitch * step };
     VEC3(float) right = { .x = cyaw * step, .y = 0, .z = syaw * step };
     VEC3(float) up = { .x = 0, .y = step, .z = 0 };
 
@@ -64,4 +63,3 @@ void update_camera(GLFWwindow* window, AppState* state, float dt)
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         VEC3_SUB_INPLACE(&state->w->player->pos, up);
 }
-
