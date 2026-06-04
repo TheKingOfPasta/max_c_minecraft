@@ -39,8 +39,17 @@ MAP_DECLARE(ChunkPos, ChunkPtr, chunkpos_hash, chunkpos_eq);
 
 VECTOR_DECLARE(Face);
 
+static inline VEC3(i64) chunk_local_to_world(VEC3(i64) chunk_pos, VEC3(u8) local)
+{
+    return (VEC3(i64)){
+        .x = chunk_pos.x * CHUNK_SIZE + local.x,
+        .y = chunk_pos.y * CHUNK_SIZE + local.y,
+        .z = chunk_pos.z * CHUNK_SIZE + local.z,
+    };
+}
+
 Chunk* create_empty_chunk(VEC3(i64) pos);
 Chunk* create_random_chunk(i64 x, i64 y, i64 z);
-VECTOR(Face) chunk_to_faces(const Chunk* chunk, MAP(ChunkPos, ChunkPtr)* chunks,
-                             VECTOR(Face) face_instances);
+VECTOR(Face)
+chunk_to_faces(const Chunk* chunk, MAP(ChunkPos, ChunkPtr) * chunks, VECTOR(Face) face_instances);
 const Block* chunk_get(const Chunk* chunk, VEC3(u8) pos);

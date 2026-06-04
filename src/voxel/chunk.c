@@ -85,14 +85,8 @@ chunk_to_faces(const Chunk* c, MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) face_in
 
                     Face face = (Face){
                         .face_id = f,
-                        .texture_id = face_texture_resolve(
-                            &BlockFaces[b->type][f], 0, 0, 0),
-                        .pos =
-                        {
-                            .x = (i32)(c->pos.x * CHUNK_SIZE + x),
-                            .y = (i32)(c->pos.y * CHUNK_SIZE + y),
-                            .z = (i32)(c->pos.z * CHUNK_SIZE + z),
-                        },
+                        .texture_id = face_texture_resolve(&BlockFaces[b->type][f], 0, 0, 0),
+                        .pos = VEC3_CAST(i32, chunk_local_to_world(c->pos, (VEC3(u8)){ x, y, z })),
                     };
 
                     VECTOR_PUSH_BACK(face_instances, face);

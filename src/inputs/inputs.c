@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#include "utils/utils.h"
+
 void key_callback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action,
                   [[maybe_unused]] int mods)
 {
@@ -28,10 +30,7 @@ void cursor_callback(GLFWwindow* window, double xpos, double ypos)
     state->cam_yaw += (float)dx * CAM_SENSITIVITY;
     state->cam_pitch += (float)dy * CAM_SENSITIVITY;
 
-    if (state->cam_pitch > CAM_PITCH_LIMIT)
-        state->cam_pitch = CAM_PITCH_LIMIT;
-    if (state->cam_pitch < -CAM_PITCH_LIMIT)
-        state->cam_pitch = -CAM_PITCH_LIMIT;
+    state->cam_pitch = CLAMP(state->cam_pitch, -CAM_PITCH_LIMIT, CAM_PITCH_LIMIT);
 
     state->mouse_x = xpos;
     state->mouse_y = ypos;

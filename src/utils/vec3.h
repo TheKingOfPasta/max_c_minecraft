@@ -34,9 +34,23 @@
 
 #define VEC3_MOD(A, K) ((typeof(A)){ .x = A.x % B.x, .y = A.y % B.y, .z = A.z % B.z })
 
-#define VEC3_DIV(A, B) ((typeof(A)){ .x = A.x / B.x, .y = A.y / B.y, .z = A.z / B.z })
+#define VEC3_DIV(A, K) ((typeof(A)){ .x = A.x / (K), .y = A.y / (K), .z = A.z / (K) })
 
-#define VEC3_MUL(A, K) ((typeof(A)){ .x = A.x * B.x, .y = A.y * B.y, .z = A.z * B.z })
+#define VEC3_DIV_INPLACE(A, K)                                                                     \
+    {                                                                                              \
+        (A).x /= (K);                                                                              \
+        (A).y /= (K);                                                                              \
+        (A).z /= (K);                                                                              \
+    }
+
+#define VEC3_SCALE(A, K) ((typeof(A)){ .x = A.x * (K), .y = A.y * (K), .z = A.z * (K) })
+
+#define VEC3_SCALE_INPLACE(A, K)                                                                   \
+    {                                                                                              \
+        (A).x *= (K);                                                                              \
+        (A).y *= (K);                                                                              \
+        (A).z *= (K);                                                                              \
+    }
 
 #define VEC3_DOT(A, B) (A.x * B.x + A.y * B.y + A.z * B.z)
 
