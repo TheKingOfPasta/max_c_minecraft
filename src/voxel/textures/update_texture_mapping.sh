@@ -1,6 +1,7 @@
 #!/bin/sh
 
 ASSET_DIR="../../../assets/block_textures"
+ASS_DIR="assets/block_textures/"
 NAME="base_texture_enum"
 HEADER="$NAME.h"
 SOURCE="$NAME.c"
@@ -36,7 +37,7 @@ echo "const char* TexturePaths[TEXTURE_COUNT] = {" >> $SOURCE
 for file in "$ASSET_DIR"/*.PNG; do
     base=$(basename "$file" .PNG)
     enum_name="TEX_$(echo "$base" | tr '[:lower:]' '[:upper:]' | sed 's/[^A-Z0-9_]/_/g')"
-	echo "    [$enum_name] = \"$(realpath $file)\"," >> $SOURCE
+	echo "    [$enum_name] = \"$ASS_DIR$(basename $file)\"," >> $SOURCE
 done
 
 echo "};" >> $SOURCE
