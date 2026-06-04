@@ -22,5 +22,5 @@ typedef struct
 VECTOR_DECLARE(Face);
 
 Chunk create_random_chunk(i64 x, i64 y);
-VECTOR(Face) recreate_vertices(const Chunk* chunk);
+VECTOR(Face) chunk_to_faces(const Chunk* chunk);
 const Block* chunk_get(const Chunk* chunk, VEC3(u8) pos);

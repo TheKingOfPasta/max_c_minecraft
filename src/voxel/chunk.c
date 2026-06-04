@@ -30,7 +30,7 @@ static bool chunk_is_in_bound(VEC3(u8) pos)
     return pos.x < CHUNK_SIZE && pos.y < CHUNK_SIZE && pos.z < CHUNK_SIZE;
 }
 
-VECTOR(Face) recreate_vertices(const Chunk* chunk)
+VECTOR(Face) chunk_to_faces(const Chunk* chunk)
 {
     VECTOR(Face) face_instances;
     VECTOR_INIT(face_instances);
