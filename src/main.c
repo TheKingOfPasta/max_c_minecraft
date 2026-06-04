@@ -90,7 +90,7 @@ static GLuint create_fbo(int w, int h)
 typedef struct
 {
     int face;
-    VEC3(float) position;
+    VEC3(i32) position;
 } block_face;
 
 #define INSTANCE_COUNT 6
@@ -149,12 +149,12 @@ int main(void)
     double last_t = glfwGetTime();
 
     block_face instances[INSTANCE_COUNT] = {
-        (block_face){ 0, (VEC3(float)){ 0, 0, 0 } },
-        (block_face){ 1, (VEC3(float)){ 0, 0, 0 } },
-        (block_face){ 2, (VEC3(float)){ 0, 0, 0 } },
-        (block_face){ 3, (VEC3(float)){ 0, 0, 0 } },
-        (block_face){ 4, (VEC3(float)){ 0, 0, 0 } },
-        (block_face){ 5, (VEC3(float)){ 0, 0, 0 } },
+        (block_face){ 0, (VEC3(i32)){ 0, 0, 0 } },
+        (block_face){ 1, (VEC3(i32)){ 0, 0, 0 } },
+        (block_face){ 2, (VEC3(i32)){ 0, 0, 0 } },
+        (block_face){ 3, (VEC3(i32)){ 0, 0, 0 } },
+        (block_face){ 4, (VEC3(i32)){ 0, 0, 0 } },
+        (block_face){ 5, (VEC3(i32)){ 0, 0, 0 } },
     };
 
     GLuint instances_vbo;
