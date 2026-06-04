@@ -2,30 +2,31 @@
 
 - [X] Block enum
 
-- [ ] Face instantiation
-    - [ ] In vert ( I have the code )
-    - [ ] In main
+- [X] Face instantiation
+    - [X] In vert ( I have the code )
+    - [X] In main
+    - [X] Add texture id
 
 - [ ] Chunk
     - [X] Base struct
     - [ ] 1 opengl buffer
     - [ ] Gen mesh
 
-- [ ] Textures
+- [X] Textures
     - [X] Map texture to block
     - [X] Load texture
     - [X] Put them in opengl texture_array
-    - [ ] use them in frag
-
-- [ ] Player
-    - [ ] Camera Movement
-    - [ ] Collision
-    - [ ] Place and Break plock
-        - [ ] raycast in voxel space ( I have the code )
-        - [ ] re upload buffer
+    - [X] use them in frag
 
 - [ ] World
     - [ ] hashmap
+
+- [ ] Player
+    - [ ] Camera Movement
+    - [ ] Place and Break plock
+        - [ ] raycast in voxel space ( I have the code )
+        - [ ] re upload buffer
+    - [ ] Collision
 
 Memory allocator chunks
 

@@ -29,37 +29,9 @@ static void init_mvp(void)
 
 static GLuint create_cube_vao(void)
 {
-    // clang-format off
-    /*float vertices[] = {
-        // front
-        -0.5f, -0.5f, 0.5f,  0.5f, -0.5f, 0.5f,  0.5f, 0.5f, 0.5f,
-        -0.5f, -0.5f, 0.5f,  0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
-        // back
-        0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f,  0.5f, 0.5f, -0.5f,
-        // left
-        -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
-        -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f,
-        // right
-        0.5f, -0.5f, 0.5f,  0.5f, -0.5f, -0.5f,  0.5f, 0.5f, -0.5f,
-        0.5f, -0.5f, 0.5f,  0.5f, 0.5f, -0.5f,  0.5f, 0.5f, 0.5f,
-        // top
-        -0.5f, 0.5f, 0.5f,  0.5f, 0.5f, 0.5f,  0.5f, 0.5f, -0.5f,
-        -0.5f, 0.5f, 0.5f,  0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f,
-        // bottom
-        -0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, 0.5f,
-        -0.5f, -0.5f, -0.5f,  0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f,
-    };*/
-    // clang-format on
-
-    GLuint vao/*, vbo*/;
+    GLuint vao;
     glGenVertexArrays(1, &vao);
-    //glGenBuffers(1, &vbo);
     glBindVertexArray(vao);
-    //glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    //glEnableVertexAttribArray(LOCATION_POS);
-    //glVertexAttribPointer(LOCATION_POS, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
     return vao;
 }
 
@@ -91,6 +63,7 @@ typedef struct
 {
     int face;
     VEC3(i32) position;
+    int texture_id;
 } block_face;
 
 #define INSTANCE_COUNT 6
@@ -149,12 +122,9 @@ int main(void)
     double last_t = glfwGetTime();
 
     block_face instances[INSTANCE_COUNT] = {
-        (block_face){ 0, (VEC3(i32)){ 0, 0, 0 } },
-        (block_face){ 1, (VEC3(i32)){ 0, 0, 0 } },
-        (block_face){ 2, (VEC3(i32)){ 0, 0, 0 } },
-        (block_face){ 3, (VEC3(i32)){ 0, 0, 0 } },
-        (block_face){ 4, (VEC3(i32)){ 0, 0, 0 } },
-        (block_face){ 5, (VEC3(i32)){ 0, 0, 0 } },
+        (block_face){ 0, (VEC3(i32)){ 0, 0, 0 }, 1 }, (block_face){ 1, (VEC3(i32)){ 0, 0, 0 }, 2 },
+        (block_face){ 2, (VEC3(i32)){ 0, 0, 0 }, 1 }, (block_face){ 3, (VEC3(i32)){ 0, 0, 0 }, 3 },
+        (block_face){ 4, (VEC3(i32)){ 0, 0, 0 }, 1 }, (block_face){ 5, (VEC3(i32)){ 0, 0, 0 }, 4 },
     };
 
     GLuint instances_vbo;
@@ -164,13 +134,18 @@ int main(void)
     glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(block_face) * INSTANCE_COUNT, instances, GL_STATIC_DRAW);
 
-    glVertexAttribIPointer(0, 1, GL_INT,   sizeof(block_face), (void*)offsetof(block_face, face));
+    glVertexAttribIPointer(0, 1, GL_INT, sizeof(block_face), (void*)offsetof(block_face, face));
     glEnableVertexAttribArray(0);
     glVertexAttribDivisor(0, 1);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(block_face), (void*)offsetof(block_face, position));
+    glVertexAttribIPointer(1, 3, GL_INT, sizeof(block_face), (void*)offsetof(block_face, position));
     glEnableVertexAttribArray(1);
     glVertexAttribDivisor(1, 1);
+
+    glVertexAttribIPointer(2, 1, GL_INT, sizeof(block_face),
+                           (void*)offsetof(block_face, texture_id));
+    glEnableVertexAttribArray(2);
+    glVertexAttribDivisor(2, 1);
 
     while (!glfwWindowShouldClose(win))
     {

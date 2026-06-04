@@ -1,7 +1,12 @@
 #version 460
 
+layout(binding = 0) uniform sampler2DArray texSampler;
+
+layout(location = 0) in vec3 fragTexCoord;
+
 layout(location = 0) out vec4 outColor;
 
 void main() {
-    outColor = vec4(0.9, 0.7, 0.4, 1.0);
+    outColor = texture(texSampler, fragTexCoord);
 }
+
