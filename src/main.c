@@ -76,9 +76,12 @@ static void render(GLuint fbo, GLuint prog, GLuint cube_vao, GLuint mvp_ubo, con
 
     glBindVertexArray(cube_vao);
 
-    VECTOR(Face) f = chunk_to_faces(c);
+    VECTOR(Face) face_instances;
+    VECTOR_INIT(face_instances);
 
-    draw_instances(f);
+    face_instances = chunk_to_faces(c, face_instances);
+
+    draw_instances(face_instances);
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);

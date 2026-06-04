@@ -30,11 +30,8 @@ static bool chunk_is_in_bound(VEC3(u8) pos)
     return pos.x < CHUNK_SIZE && pos.y < CHUNK_SIZE && pos.z < CHUNK_SIZE;
 }
 
-VECTOR(Face) chunk_to_faces(const Chunk* chunk)
+VECTOR(Face) chunk_to_faces(const Chunk* chunk, VECTOR(Face) face_instances)
 {
-    VECTOR(Face) face_instances;
-    VECTOR_INIT(face_instances);
-
     static const VEC3(i8) dirs[6] = {
         {1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1},
     };
