@@ -16,12 +16,6 @@ World init_world(void)
 
     VECTOR_INIT(w.chunks);
 
-    Chunk* c = create_random_chunk(0, 0, 0);
-
-    ChunkPos pos = (VEC3(i64)){ 0, 0, 0 };
-
-    MAP_INSERT_T(ChunkPos, ChunkPtr, w.chunks, pos, c);
-
     return w;
 }
 
@@ -64,8 +58,6 @@ void generate_new_chunks(World* w, GLuint vao, size_t* face_count)
     if (c != NULL && (*c)->visited)
         return;
 
-    (*c)->visited = true;
-
     for (i64 z = -3; z <= 3; z++)
     for (i64 y = -3; y <= 3; y++)
     for (i64 x = -3; x <= 3; x++)
@@ -75,6 +67,11 @@ void generate_new_chunks(World* w, GLuint vao, size_t* face_count)
 
         add_missing_chunk(w, pos);
     }
+
+    if (!c)
+        c = MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, player_chunk_pos);
+
+    (*c)->visited = true;
 
     regenerate_faces_buffer(w, vao, face_count);
 }
