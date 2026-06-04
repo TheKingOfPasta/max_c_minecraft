@@ -54,16 +54,16 @@ VECTOR(Face) chunk_to_faces(const Chunk* chunk, VECTOR(Face) face_instances)
                         continue;
 
                     Face face = (Face){
-				.face_id = f,
-				.texture_id = face_texture_resolve(
-					&BlockFaces[b->type][f], 0, 0, 0),
-				.pos =
-				{
-					.x = (i32)(chunk->pos.x * CHUNK_SIZE + x),
-					.y = (i32)(chunk->pos.y * CHUNK_SIZE + y),
-					.z = (i32)(chunk->pos.z * CHUNK_SIZE + z),
-				},
-			};
+                        .face_id = f,
+                        .texture_id = face_texture_resolve(
+                            &BlockFaces[b->type][f], 0, 0, 0),
+                        .pos =
+                        {
+                            .x = (i32)(chunk->pos.x * CHUNK_SIZE + x),
+                            .y = (i32)(chunk->pos.y * CHUNK_SIZE + y),
+                            .z = (i32)(chunk->pos.z * CHUNK_SIZE + z),
+                        },
+                    };
 
                     VECTOR_PUSH_BACK(face_instances, face);
                 }
