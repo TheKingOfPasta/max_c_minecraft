@@ -9,6 +9,7 @@
 #include "opengl/mvp_model.h"
 #include "opengl/shader_compile.h"
 #include "utils/vec3.h"
+#include "voxel/face.h"
 #include "voxel/textures/array_texture.h"
 
 #if defined(__NIXOS__)
@@ -87,12 +88,6 @@ static GLuint create_fbo(int w, int h)
     return fbo;
 }
 
-typedef struct
-{
-    int face;
-    VEC3(i32) position;
-} block_face;
-
 #define INSTANCE_COUNT 6
 
 static void render(GLuint fbo, GLuint prog, GLuint cube_vao, GLuint mvp_ubo)
@@ -148,13 +143,13 @@ int main(void)
 
     double last_t = glfwGetTime();
 
-    block_face instances[INSTANCE_COUNT] = {
-        (block_face){ 0, (VEC3(i32)){ 0, 0, 0 } },
-        (block_face){ 1, (VEC3(i32)){ 0, 0, 0 } },
-        (block_face){ 2, (VEC3(i32)){ 0, 0, 0 } },
-        (block_face){ 3, (VEC3(i32)){ 0, 0, 0 } },
-        (block_face){ 4, (VEC3(i32)){ 0, 0, 0 } },
-        (block_face){ 5, (VEC3(i32)){ 0, 0, 0 } },
+    Face instances[INSTANCE_COUNT] = {
+        (Face){ 0, 0, (VEC3(i32)){ 0, 0, 0 } },
+        (Face){ 0, 1, (VEC3(i32)){ 0, 0, 0 } },
+        (Face){ 0, 2, (VEC3(i32)){ 0, 0, 0 } },
+        (Face){ 0, 3, (VEC3(i32)){ 0, 0, 0 } },
+        (Face){ 0, 4, (VEC3(i32)){ 0, 0, 0 } },
+        (Face){ 0, 5, (VEC3(i32)){ 0, 0, 0 } },
     };
 
     GLuint instances_vbo;
@@ -162,13 +157,13 @@ int main(void)
 
     glBindVertexArray(cube_vao);
     glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(block_face) * INSTANCE_COUNT, instances, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Face) * INSTANCE_COUNT, instances, GL_STATIC_DRAW);
 
-    glVertexAttribIPointer(0, 1, GL_INT,   sizeof(block_face), (void*)offsetof(block_face, face));
+    glVertexAttribIPointer(0, 1, GL_INT,   sizeof(Face), (void*)offsetof(Face, face_id));
     glEnableVertexAttribArray(0);
     glVertexAttribDivisor(0, 1);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(block_face), (void*)offsetof(block_face, position));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Face), (void*)offsetof(Face, pos));
     glEnableVertexAttribArray(1);
     glVertexAttribDivisor(1, 1);
 
