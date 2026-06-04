@@ -7,10 +7,10 @@
     - [X] In main
     - [X] Add texture id
 
-- [ ] Chunk
+- [X] Chunk
     - [X] Base struct
-    - [ ] 1 opengl buffer
-    - [ ] Gen mesh
+    - [X] 1 opengl buffer
+    - [X] Gen mesh
 
 - [X] Textures
     - [X] Map texture to block
@@ -18,17 +18,29 @@
     - [X] Put them in opengl texture_array
     - [X] use them in frag
 
-- [ ] World
-    - [ ] hashmap
+- [X] World
+    - [X] hashmap
+    - [ ] export
+    - [ ] import
 
 - [ ] Player
-    - [ ] Camera Movement
+    - [X] Camera Movement
     - [ ] Place and Break plock
         - [ ] raycast in voxel space ( I have the code )
         - [ ] re upload buffer
     - [ ] Collision
 
-- Make it look good
+- [ ] terrain Gen
+    - [ ] generate on demand
+    - [ ] not on cpu gen
+    - [ ] simple height map terrain
+    - [ ] proper layered noise
+    - [ ] generate structure
+    - [ ] biome
+    - [ ] proper structure for noise layer
+    - [ ] use rastringin function for island
+
+- Visual effect
     - [ ] ambient occlusion
 
 Memory allocator chunks
