@@ -28,6 +28,9 @@
         - [ ] re upload buffer
     - [ ] Collision
 
+- Make it look good
+    - [ ] ambient occlusion
+
 Memory allocator chunks
 
 - Optimizations

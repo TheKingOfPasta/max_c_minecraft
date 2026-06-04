@@ -53,6 +53,8 @@ const FaceTextureBuilder BlockFaceBuilders[][FACE_COUNT] = {
     [BLK_GRASS] = DONUT(LEAF(TEX_GRASS_SIDE), LEAF(TEX_GRASS), LEAF(TEX_DIRT)),
     [BLK_STONE] = UNIFO(LEAF(TEX_STONE)),
     [BLK_OAK] = BARREL(LEAF(TEX_OAK), LEAF(TEX_OAK_INNER)),
+    [BLK_SAND] = UNIFO(LEAF(TEX_SAND)),
+    [BLK_GRAVEL] = UNIFO(LEAF(TEX_GRAVEL)),
 };
 
 const int BlockFaceBuildersCount = (sizeof(BlockFaceBuilders) / sizeof(*BlockFaceBuilders));
