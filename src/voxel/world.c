@@ -6,6 +6,7 @@
 #include "utils/container.h"
 #include "utils/vec3.h"
 #include "voxel/chunk.h"
+#include "voxel/terrain_gen/gen.h"
 
 World init_world(void)
 {
@@ -25,7 +26,10 @@ static void add_missing_chunk(World* w, VEC3(i64) pos)
     if (existing)
         return;
 
-    Chunk* c = create_random_chunk(pos.x, pos.y, pos.z);
+    Chunk* c = create_empty_chunk(pos);
+
+    gen_terrain(42, c);
+
     MAP_INSERT_T(ChunkPos, ChunkPtr, w->chunks, pos, c);
 }
 

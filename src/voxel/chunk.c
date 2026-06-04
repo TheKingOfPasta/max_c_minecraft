@@ -4,6 +4,14 @@
 
 #include "block.h"
 
+Chunk* create_empty_chunk(VEC3(i64) pos)
+{
+    Chunk* c = calloc(1, sizeof(Chunk));
+    c->pos = pos;
+
+    return c;
+}
+
 Chunk* create_random_chunk(i64 x, i64 y, i64 z)
 {
     Chunk* c = calloc(1, sizeof(Chunk));
