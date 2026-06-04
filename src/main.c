@@ -2,13 +2,16 @@
 // glad before
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
+#include "opengl/instances.h"
 #include "opengl/mvp_model.h"
 #include "opengl/shader_compile.h"
 #include "utils/vec3.h"
+#include "voxel/chunk.h"
 #include "voxel/face.h"
 #include "voxel/textures/array_texture.h"
 
@@ -60,9 +63,7 @@ static GLuint create_fbo(int w, int h)
     return fbo;
 }
 
-#define INSTANCE_COUNT 6
-
-static void render(GLuint fbo, GLuint prog, GLuint cube_vao, GLuint mvp_ubo)
+static void render(GLuint fbo, GLuint prog, GLuint cube_vao, GLuint mvp_ubo, const Chunk* c)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glViewport(0, 0, WIN_W, WIN_H);
@@ -74,7 +75,10 @@ static void render(GLuint fbo, GLuint prog, GLuint cube_vao, GLuint mvp_ubo)
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mvp_model), mvp);
 
     glBindVertexArray(cube_vao);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, INSTANCE_COUNT);
+
+    VECTOR(Face) f = chunk_to_faces(c);
+
+    draw_instances(f);
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -113,38 +117,11 @@ int main(void)
     GLuint mvp_ubo;
     bind_uniform_buffer(&mvp_ubo, BINDING_MVP, mvp, sizeof(mvp_model));
 
+    GLuint instances_vbo = describe_faces(cube_vao);
+
     double last_t = glfwGetTime();
 
-    Face instances[INSTANCE_COUNT] = {
-        (Face){ 0, 0, (VEC3(i32)){ 0, 0, 0 } },
-        (Face){ 0, 1, (VEC3(i32)){ 0, 0, 0 } },
-        (Face){ 0, 2, (VEC3(i32)){ 0, 0, 0 } },
-        (Face){ 0, 3, (VEC3(i32)){ 0, 0, 0 } },
-        (Face){ 0, 4, (VEC3(i32)){ 0, 0, 0 } },
-        (Face){ 0, 5, (VEC3(i32)){ 0, 0, 0 } },
-    };
-
-    GLuint instances_vbo;
-    glGenBuffers(1, &instances_vbo);
-
-    glBindVertexArray(cube_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Face) * INSTANCE_COUNT, instances, GL_STATIC_DRAW);
-
-    glVertexAttribIPointer(0, 1, GL_INT,   sizeof(Face), (void*)offsetof(Face, face_id));
-    glEnableVertexAttribArray(0);
-    glVertexAttribDivisor(0, 1);
-
-    glVertexAttribPointer(1, 3, GL_INT, GL_FALSE, sizeof(Face), (void*)offsetof(Face, pos));
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribDivisor(1, 1);
-
-    glVertexAttribIPointer(2, 1, GL_INT, sizeof(Face),
-                           (void*)offsetof(Face, texture_id));
-
-    glEnableVertexAttribArray(2);
-    glVertexAttribDivisor(2, 1);
+    const Chunk c = create_random_chunk(0, 0, 0);
 
     while (!glfwWindowShouldClose(win))
     {
@@ -155,7 +132,7 @@ int main(void)
         update_camera(win, &state, dt);
         mat4_view_from_camera(mvp->view, state.cam_pos, state.cam_pitch, state.cam_yaw);
 
-        render(fbo, render_prog, cube_vao, mvp_ubo);
+        render(fbo, render_prog, cube_vao, mvp_ubo, &c);
 
         glfwSwapBuffers(win);
         glfwPollEvents();

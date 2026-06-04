@@ -4,9 +4,9 @@
 
 #include "block.h"
 
-Chunk create_random_chunk(i64 x, i64 y)
+Chunk create_random_chunk(i64 x, i64 y, i64 z)
 {
-    Chunk c = { .pos = (VEC3(i64)){ .x = x, .y = y } };
+    Chunk c = { .pos = (VEC3(i64)){ .x = x, .y = y, .z = z } };
 
     for (uint8_t i = 0; i < CHUNK_SIZE; i++)
     for (uint8_t j = 0; j < CHUNK_SIZE; j++)

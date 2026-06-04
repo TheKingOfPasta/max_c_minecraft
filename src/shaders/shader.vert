@@ -7,8 +7,8 @@ layout(binding = 0) uniform UniformBufferObject {
 } ubo;
 
 layout(location = 0) in int face;
-layout(location = 1) in ivec3 pos;
-layout(location = 2) in int   inTextureId;
+layout(location = 1) in int   inTextureId;
+layout(location = 2) in ivec3 pos;
 
 layout(location = 0) out vec3 fragTexCoord;
 
