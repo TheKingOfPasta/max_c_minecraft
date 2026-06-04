@@ -132,6 +132,9 @@ int main(void)
 
         render(fbo, render_prog, cube_vao, mvp_ubo, &c);
 
+        printf("\r%f                        ", 1.0 / dt);
+        fflush(stdout);
+
         glfwSwapBuffers(win);
         glfwPollEvents();
     }
