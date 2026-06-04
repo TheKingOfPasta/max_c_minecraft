@@ -27,7 +27,6 @@ static void add_missing_chunk(World* w, VEC3(i64) pos)
 
     Chunk* c = create_random_chunk(pos.x, pos.y, pos.z);
     MAP_INSERT_T(ChunkPos, ChunkPtr, w->chunks, pos, c);
-    printf("Adding %zi %zi %zi\n", pos.x, pos.y, pos.z);
 }
 
 static void regenerate_faces_buffer(World *w, GLuint vao, size_t* face_count)
