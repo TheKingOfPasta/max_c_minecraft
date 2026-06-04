@@ -23,12 +23,12 @@ const ivec3 faceOffsets[6][4] = {
 };
 
 const ivec2 faceUVs[6][4] = {
-    {ivec2(0,1), ivec2(1,1), ivec2(1,0), ivec2(0,0)}, // +X
-    {ivec2(1,0), ivec2(0,0), ivec2(0,1), ivec2(1,1)}, // -X
+    {ivec2(1,1), ivec2(1,0), ivec2(0,0), ivec2(0,1)}, // +X
+    {ivec2(1,1), ivec2(1,0), ivec2(0,0), ivec2(0,1)}, // -X
     {ivec2(1,0), ivec2(0,0), ivec2(0,1), ivec2(1,1)}, // +Y
     {ivec2(0,1), ivec2(1,1), ivec2(1,0), ivec2(0,0)}, // -Y
-    {ivec2(1,0), ivec2(0,0), ivec2(0,1), ivec2(1,1)}, // +Z
-    {ivec2(0,1), ivec2(1,1), ivec2(1,0), ivec2(0,0)}, // -Z
+    {ivec2(1,1), ivec2(1,0), ivec2(0,0), ivec2(0,1)}, // +Z
+    {ivec2(1,1), ivec2(1,0), ivec2(0,0), ivec2(0,1)}, // -Z
 };
 
 const int quadIndices[6] = {0, 1, 2, 2, 3, 0};

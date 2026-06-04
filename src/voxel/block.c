@@ -4,9 +4,9 @@
 #include "textures/base_texture_enum.h"
 #include "textures/face_texture.h"
 
-#define BARREL(SIDE, TOPBOT) { (SIDE), (SIDE), (SIDE), (SIDE), (TOPBOT), (TOPBOT) }
+#define BARREL(SIDE, TOPBOT) { (SIDE), (SIDE), (TOPBOT), (TOPBOT), (SIDE), (SIDE) }
 
-#define DONUT(SIDE, TOP, BOT) { (SIDE), (SIDE), (SIDE), (SIDE), (TOP), (BOT) }
+#define DONUT(SIDE, TOP, BOT) { (SIDE), (SIDE), (TOP), (BOT), (SIDE), (SIDE) }
 
 #define UNIFO(TEXT) { (TEXT), (TEXT), (TEXT), (TEXT), (TEXT), (TEXT) }
 
