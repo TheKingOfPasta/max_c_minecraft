@@ -22,20 +22,3 @@ void render(GLuint fbo, GLuint prog, GLuint mvp_ubo, size_t face_count)
     glBlitFramebuffer(0, 0, WIN_W, WIN_H, 0, 0, WIN_W, WIN_H, GL_COLOR_BUFFER_BIT, GL_LINEAR);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-
-size_t regenerate_faces_buffer(World *w, GLuint vao)
-{
-    glBindVertexArray(vao);
-
-    VECTOR(Face) face_instances;
-    VECTOR_INIT(face_instances);
-
-    MAP_FOR_EACH(w->chunks, c)
-    {
-        face_instances = chunk_to_faces(c->value, face_instances);
-    }
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Face) * VECTOR_SIZE(face_instances), face_instances.data, GL_STATIC_DRAW);
-
-    return face_instances.size;
-}
