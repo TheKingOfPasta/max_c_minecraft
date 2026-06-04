@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 
+#include "array_atlas.h"
 #include "base_texture_enum.h"
 
 static GLuint atlas_upload_to_gpu(ArrayAtlas* a)
@@ -35,4 +36,11 @@ GLuint load_block_texture_array(void)
     GLuint tex = atlas_upload_to_gpu(&atlas);
     atlas_free(&atlas);
     return tex;
+}
+
+void texture_array_init(void)
+{
+    GLuint tex_array = load_block_texture_array();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, tex_array);
 }
