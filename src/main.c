@@ -30,37 +30,9 @@ static void init_mvp(void)
 
 static GLuint create_cube_vao(void)
 {
-    // clang-format off
-    /*float vertices[] = {
-        // front
-        -0.5f, -0.5f, 0.5f,  0.5f, -0.5f, 0.5f,  0.5f, 0.5f, 0.5f,
-        -0.5f, -0.5f, 0.5f,  0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
-        // back
-        0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f,  0.5f, 0.5f, -0.5f,
-        // left
-        -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
-        -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f,
-        // right
-        0.5f, -0.5f, 0.5f,  0.5f, -0.5f, -0.5f,  0.5f, 0.5f, -0.5f,
-        0.5f, -0.5f, 0.5f,  0.5f, 0.5f, -0.5f,  0.5f, 0.5f, 0.5f,
-        // top
-        -0.5f, 0.5f, 0.5f,  0.5f, 0.5f, 0.5f,  0.5f, 0.5f, -0.5f,
-        -0.5f, 0.5f, 0.5f,  0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f,
-        // bottom
-        -0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, 0.5f,
-        -0.5f, -0.5f, -0.5f,  0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f,
-    };*/
-    // clang-format on
-
-    GLuint vao/*, vbo*/;
+    GLuint vao;
     glGenVertexArrays(1, &vao);
-    //glGenBuffers(1, &vbo);
     glBindVertexArray(vao);
-    //glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    //glEnableVertexAttribArray(LOCATION_POS);
-    //glVertexAttribPointer(LOCATION_POS, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
     return vao;
 }
 
@@ -163,9 +135,16 @@ int main(void)
     glEnableVertexAttribArray(0);
     glVertexAttribDivisor(0, 1);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Face), (void*)offsetof(Face, pos));
+    glVertexAttribPointer(1, 3, GL_INT, GL_FALSE, sizeof(Face), (void*)offsetof(Face, pos));
+
     glEnableVertexAttribArray(1);
     glVertexAttribDivisor(1, 1);
+
+    glVertexAttribIPointer(2, 1, GL_INT, sizeof(Face),
+                           (void*)offsetof(Face, texture_id));
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribDivisor(2, 1);
 
     while (!glfwWindowShouldClose(win))
     {

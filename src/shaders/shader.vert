@@ -1,4 +1,4 @@
-#version 450
+#version 460
 
 layout(binding = 0) uniform UniformBufferObject {
     mat4 model;
@@ -8,6 +8,10 @@ layout(binding = 0) uniform UniformBufferObject {
 
 layout(location = 0) in int face;
 layout(location = 1) in ivec3 pos;
+layout(location = 2) in int   inTextureId;
+
+layout(location = 0) out vec3 fragTexCoord;
+
 
 const ivec3 faceOffsets[6][4] = {
     {ivec3(1,0,0), ivec3(1,1,0), ivec3(1,1,1), ivec3(1,0,1)}, // +X
@@ -34,5 +38,5 @@ void main() {
 
     ivec3 worldPos = pos + faceOffsets[face][v];
     gl_Position  = ubo.proj * ubo.view * ubo.model * ivec4(worldPos, 1.0);
-    //fragTexCoord = ivec3(faceUVs[inFaceId][v], float(inTextureId));
+    fragTexCoord = vec3(faceUVs[face][v], float(inTextureId));
 }
