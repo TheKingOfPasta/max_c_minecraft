@@ -4,11 +4,13 @@
 // glad before
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
-
 #include <stddef.h>
+
 #include "utils/container.h"
-#include "voxel/player.h"
 #include "voxel/chunk.h"
+#include "voxel/player.h"
+
+#define LOADED_CHUNK_DISTANCE 20
 
 typedef struct
 {

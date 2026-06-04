@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "block.h"
+#include "utils/vec3.h"
 
 Chunk* create_empty_chunk(VEC3(i64) pos)
 {
@@ -40,9 +41,10 @@ static bool chunk_is_in_bound(VEC3(u8) pos)
     return pos.x < CHUNK_SIZE && pos.y < CHUNK_SIZE && pos.z < CHUNK_SIZE;
 }
 
-VECTOR(Face) chunk_to_faces(const Chunk* chunk, VECTOR(Face) face_instances)
+VECTOR(Face)
+chunk_to_faces(const Chunk* c, MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) face_instances)
 {
-    static const VEC3(i8) dirs[6] = {
+    static const VEC3(i64) dirs[6] = {
         { 1, 0, 0 }, { -1, 0, 0 }, { 0, 1, 0 }, { 0, -1, 0 }, { 0, 0, 1 }, { 0, 0, -1 },
     };
 
@@ -50,7 +52,7 @@ VECTOR(Face) chunk_to_faces(const Chunk* chunk, VECTOR(Face) face_instances)
         for (u8 y = 0; y < CHUNK_SIZE; y++)
             for (u8 z = 0; z < CHUNK_SIZE; z++)
             {
-                const Block* b = chunk_get(chunk, (VEC3(u8)){ x, y, z });
+                const Block* b = chunk_get(c, (VEC3(u8)){ x, y, z });
                 if (b->type == BLK_AIR)
                     continue;
 
@@ -58,8 +60,28 @@ VECTOR(Face) chunk_to_faces(const Chunk* chunk, VECTOR(Face) face_instances)
                 {
                     VEC3(u8) npos = { x + dirs[f].x, y + dirs[f].y, z + dirs[f].z };
 
-                    if (chunk_is_in_bound(npos) && chunk_get(chunk, npos)->type != BLK_AIR)
-                        continue;
+                    if (chunk_is_in_bound(npos))
+                    {
+                        if (chunk_get(c, npos)->type != BLK_AIR)
+                            continue;
+                    }
+                    else
+                    {
+                        VEC3(i64) neighbor_chunk_pos = VEC3_ADD(dirs[f], c->pos);
+
+                        ChunkPtr* neighbor = MAP_GET_T(ChunkPos, ChunkPtr, *w, neighbor_chunk_pos);
+                        if (neighbor)
+                        {
+                            VEC3(u8)
+                            local = {
+                                dirs[f].x == 1 ? 0 : (dirs[f].x == -1 ? CHUNK_SIZE - 1 : x),
+                                dirs[f].y == 1 ? 0 : (dirs[f].y == -1 ? CHUNK_SIZE - 1 : y),
+                                dirs[f].z == 1 ? 0 : (dirs[f].z == -1 ? CHUNK_SIZE - 1 : z),
+                            };
+                            if (chunk_get(*neighbor, local)->type != BLK_AIR)
+                                continue;
+                        }
+                    }
 
                     Face face = (Face){
                         .face_id = f,
@@ -67,9 +89,9 @@ VECTOR(Face) chunk_to_faces(const Chunk* chunk, VECTOR(Face) face_instances)
                             &BlockFaces[b->type][f], 0, 0, 0),
                         .pos =
                         {
-                            .x = (i32)(chunk->pos.x * CHUNK_SIZE + x),
-                            .y = (i32)(chunk->pos.y * CHUNK_SIZE + y),
-                            .z = (i32)(chunk->pos.z * CHUNK_SIZE + z),
+                            .x = (i32)(c->pos.x * CHUNK_SIZE + x),
+                            .y = (i32)(c->pos.y * CHUNK_SIZE + y),
+                            .z = (i32)(c->pos.z * CHUNK_SIZE + z),
                         },
                     };
 
