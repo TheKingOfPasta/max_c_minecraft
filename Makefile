@@ -7,7 +7,9 @@ CFLAGS += -O3 -std=c23 -fopenmp -Isrc
 LDFLAGS = -lglfw -lGL -lm -lGLEW -ldl
 
 ifeq ($(shell test -f /etc/NIXOS && echo yes),yes)
-    CFLAGS += -D__NIXOS__
+    CFLAGS += -DWIN_W=1920 -DWIN_H=1200
+else
+    CFLAGS += -DWIN_W=1920 -DWIN_H=1080
 endif
 
 CFLAGS += $(shell pkg-config --cflags glfw3)

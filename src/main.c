@@ -7,23 +7,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "opengl/instances.h"
 #include "opengl/mvp_model.h"
 #include "opengl/shader_compile.h"
-#include "utils/container.h"
-#include "utils/vec3.h"
-#include "voxel/chunk.h"
-#include "voxel/face.h"
 #include "voxel/textures/array_texture.h"
 #include "voxel/world.h"
-
-#if defined(__NIXOS__)
-#    define WIN_W 1920
-#    define WIN_H 1200
-#else
-#    define WIN_W 1920
-#    define WIN_H 1080
-#endif
+#include "opengl/render.h"
+#include "opengl/instances.h"
 
 static void init_mvp(void)
 {
@@ -63,35 +52,6 @@ static GLuint create_fbo(int w, int h)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
     return fbo;
-}
-
-static void render(GLuint fbo, GLuint prog, GLuint cube_vao, GLuint mvp_ubo, MAP(ChunkPos, ChunkPtr)* chunks)
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glViewport(0, 0, WIN_W, WIN_H);
-    glClearColor(0.4f, 0.5f, 0.7f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glUseProgram(prog);
-    glBindBuffer(GL_UNIFORM_BUFFER, mvp_ubo);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mvp_model), mvp);
-
-    glBindVertexArray(cube_vao);
-
-    VECTOR(Face) face_instances;
-    VECTOR_INIT(face_instances);
-
-    MAP_FOR_EACH((*chunks), c)
-    {
-        face_instances = chunk_to_faces(c->value, face_instances);
-    }
-
-    draw_instances(face_instances);
-
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, WIN_W, WIN_H, 0, 0, WIN_W, WIN_H, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 int main(void)
