@@ -171,5 +171,10 @@ GLFWwindow* init_window(AppState* state)
     glfwSetKeyCallback(win, key_callback);
     glfwSetCursorPosCallback(win, cursor_callback);
 
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+
+    glEnable(GL_DEPTH_TEST);
+
     return win;
 }

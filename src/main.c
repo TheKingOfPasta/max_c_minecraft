@@ -112,8 +112,6 @@ int main(void)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, tex_array);
 
-    glEnable(GL_DEPTH_TEST);
-
     GLuint mvp_ubo;
     bind_uniform_buffer(&mvp_ubo, BINDING_MVP, mvp, sizeof(mvp_model));
 
