@@ -3,10 +3,10 @@
 
 // clang-format off
 const char* TexturePaths[TEXTURE_COUNT] = {
-    [TEX_DIRT] = "/home/azea/dev/max_c_minecraft/assets/block_textures/dirt.PNG",
-    [TEX_GRASS] = "/home/azea/dev/max_c_minecraft/assets/block_textures/grass.PNG",
-    [TEX_GRASS_SIDE] = "/home/azea/dev/max_c_minecraft/assets/block_textures/grass_side.PNG",
-    [TEX_OAK_INNER] = "/home/azea/dev/max_c_minecraft/assets/block_textures/oak_inner.PNG",
-    [TEX_OAK] = "/home/azea/dev/max_c_minecraft/assets/block_textures/oak.PNG",
-    [TEX_STONE] = "/home/azea/dev/max_c_minecraft/assets/block_textures/stone.PNG",
+    [TEX_DIRT] = "assets/block_textures/dirt.PNG",
+    [TEX_GRASS] = "assets/block_textures/grass.PNG",
+    [TEX_GRASS_SIDE] = "assets/block_textures/grass_side.PNG",
+    [TEX_OAK_INNER] = "assets/block_textures/oak_inner.PNG",
+    [TEX_OAK] = "assets/block_textures/oak.PNG",
+    [TEX_STONE] = "assets/block_textures/stone.PNG",
 };
