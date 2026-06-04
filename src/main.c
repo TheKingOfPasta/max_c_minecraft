@@ -2,7 +2,6 @@
 // glad before
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -76,9 +75,7 @@ int main(void)
     GLuint cube_vao = create_cube_vao();
     GLuint fbo = create_fbo(WIN_W, WIN_H);
 
-    GLuint tex_array = load_block_texture_array();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, tex_array);
+    texture_array_init();
 
     GLuint mvp_ubo;
     bind_uniform_buffer(&mvp_ubo, BINDING_MVP, mvp, sizeof(mvp_model));
