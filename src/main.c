@@ -10,10 +10,12 @@
 #include "opengl/instances.h"
 #include "opengl/mvp_model.h"
 #include "opengl/shader_compile.h"
+#include "utils/container.h"
 #include "utils/vec3.h"
 #include "voxel/chunk.h"
 #include "voxel/face.h"
 #include "voxel/textures/array_texture.h"
+#include "voxel/world.h"
 
 #if defined(__NIXOS__)
 #    define WIN_W 1920
@@ -63,7 +65,7 @@ static GLuint create_fbo(int w, int h)
     return fbo;
 }
 
-static void render(GLuint fbo, GLuint prog, GLuint cube_vao, GLuint mvp_ubo, const Chunk* c)
+static void render(GLuint fbo, GLuint prog, GLuint cube_vao, GLuint mvp_ubo, MAP(ChunkPos, ChunkPtr)* chunks)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glViewport(0, 0, WIN_W, WIN_H);
@@ -79,7 +81,10 @@ static void render(GLuint fbo, GLuint prog, GLuint cube_vao, GLuint mvp_ubo, con
     VECTOR(Face) face_instances;
     VECTOR_INIT(face_instances);
 
-    face_instances = chunk_to_faces(c, face_instances);
+    MAP_FOR_EACH((*chunks), c)
+    {
+        face_instances = chunk_to_faces(c->value, face_instances);
+    }
 
     draw_instances(face_instances);
 
@@ -122,7 +127,7 @@ int main(void)
 
     double last_t = glfwGetTime();
 
-    const Chunk c = create_random_chunk(0, 0, 0);
+    World w = init_world();
 
     while (!glfwWindowShouldClose(win))
     {
@@ -133,7 +138,7 @@ int main(void)
         update_camera(win, &state, dt);
         mat4_view_from_camera(mvp->view, state.cam_pos, state.cam_pitch, state.cam_yaw);
 
-        render(fbo, render_prog, cube_vao, mvp_ubo, &c);
+        render(fbo, render_prog, cube_vao, mvp_ubo, &w.chunks);
 
         printf("\r%f                        ", 1.0 / dt);
         fflush(stdout);

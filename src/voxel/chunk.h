@@ -19,6 +19,24 @@ typedef struct
     Block blocks[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
 } Chunk;
 
+typedef VEC3(i64) ChunkPos;
+typedef Chunk* ChunkPtr;
+
+static inline size_t chunkpos_hash(ChunkPos p)
+{
+    uint64_t h = (uint64_t)(uint32_t)p.x * 73856093u
+        ^ (uint64_t)(uint32_t)p.y * 19349663u
+        ^ (uint64_t)(uint32_t)p.z * 83492791u;
+    return (size_t)h;
+}
+
+static inline bool chunkpos_eq(ChunkPos a, ChunkPos b)
+{
+    return a.x == b.x && a.y == b.y && a.z == b.z;
+}
+
+MAP_DECLARE(ChunkPos, ChunkPtr, chunkpos_hash, chunkpos_eq);
+
 VECTOR_DECLARE(Face);
 
 Chunk create_random_chunk(i64 x, i64 y, i64 z);
