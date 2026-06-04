@@ -27,8 +27,7 @@ GLuint describe_faces(GLuint cube_vao)
     return instances_vbo;
 }
 
-void draw_instances(VECTOR(Face) instances)
+void draw_instances(size_t face_count)
 {
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Face) * VECTOR_SIZE(instances), instances.data, GL_STATIC_DRAW);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, VECTOR_SIZE(instances));
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, face_count);
 }

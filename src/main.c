@@ -86,6 +86,8 @@ int main(void)
 
     World w = init_world();
 
+    size_t face_count = regenerate_faces_buffer(&w, cube_vao);
+
     while (!glfwWindowShouldClose(win))
     {
         double t0 = glfwGetTime();
@@ -95,7 +97,7 @@ int main(void)
         update_camera(win, &state, dt);
         mat4_view_from_camera(mvp->view, state.cam_pos, state.cam_pitch, state.cam_yaw);
 
-        render(fbo, render_prog, cube_vao, mvp_ubo, &w.chunks);
+        render(fbo, render_prog, mvp_ubo, face_count);
 
         printf("\r%f                        ", 1.0 / dt);
         fflush(stdout);
