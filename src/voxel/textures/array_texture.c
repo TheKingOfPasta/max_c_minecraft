@@ -3,7 +3,6 @@
 #include <stddef.h>
 
 #include "array_atlas.h"
-#include "base_texture_enum.h"
 #include "voxel/block.h"
 
 static GLuint atlas_upload_to_gpu(ArrayAtlas* a)
@@ -40,12 +39,8 @@ GLuint load_block_texture_array(void)
 {
     ArrayAtlas atlas;
     atlas_init(&atlas);
-    for (BaseTextureEnum i = 0; i < TEXTURE_COUNT; i++)
-        atlas_push_from_base_texture(&atlas, i, 1);
-    GLuint tex = atlas_upload_to_gpu(&atlas);
-
     build_texture_look_up(BlockFaceBuilders, BlockFaces, &atlas);
-
+    GLuint tex = atlas_upload_to_gpu(&atlas);
     atlas_free(&atlas);
     return tex;
 }
