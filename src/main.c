@@ -63,7 +63,6 @@ int main(void)
         .mouse_initialized = false,
         .cam_pitch = 0.0f,
         .cam_yaw = 0.0f,
-        .cam_pos = { .x = 0, .y = 0, .z = -3 },
     };
 
     GLFWwindow* win = init_window(&state);
@@ -85,8 +84,10 @@ int main(void)
     double last_t = glfwGetTime();
 
     World w = init_world();
+    state.w = &w;
 
-    size_t face_count = regenerate_faces_buffer(&w, cube_vao);
+    size_t face_count;
+    generate_new_chunks(&w, cube_vao, &face_count);
 
     while (!glfwWindowShouldClose(win))
     {
@@ -95,7 +96,9 @@ int main(void)
         last_t = t0;
 
         update_camera(win, &state, dt);
-        mat4_view_from_camera(mvp->view, state.cam_pos, state.cam_pitch, state.cam_yaw);
+        mat4_view_from_camera(mvp->view, state.w->player->pos, state.cam_pitch, state.cam_yaw);
+
+        generate_new_chunks(&w, cube_vao, &face_count);
 
         render(fbo, render_prog, mvp_ubo, face_count);
 

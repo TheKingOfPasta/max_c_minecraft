@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include "utils/vec3.h"
+#include "voxel/world.h"
 
 #define CAM_PITCH_LIMIT 1.55334f
 #define CAM_SPEED 5.0f
@@ -18,7 +19,7 @@ typedef struct AppState
     double mouse_y;
     float cam_pitch;
     float cam_yaw;
-    VEC3(float) cam_pos;
+    World* w;
 } AppState;
 
 void key_callback(GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action,

@@ -16,6 +16,8 @@ typedef struct
 {
     VEC3(i64) pos;
 
+    bool visited;
+
     Block blocks[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
 } Chunk;
 

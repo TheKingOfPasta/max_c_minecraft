@@ -7,12 +7,14 @@
 
 #include <stddef.h>
 #include "utils/container.h"
+#include "voxel/player.h"
 #include "voxel/chunk.h"
 
 typedef struct
 {
     MAP(ChunkPos, ChunkPtr) chunks;
+    Player* player;
 } World;
 
 World init_world(void);
-size_t regenerate_faces_buffer(World *w, GLuint vao);
+void generate_new_chunks(World* w, GLuint vao, size_t* face_count);
