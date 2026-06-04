@@ -30,36 +30,36 @@ static void init_mvp(void)
 static GLuint create_cube_vao(void)
 {
     // clang-format off
-    float vertices[] = {
+    /*float vertices[] = {
         // front
-        -0.5f, -0.5f,  0.5f,   0.5f, -0.5f,  0.5f,   0.5f,  0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,   0.5f,  0.5f,  0.5f,  -0.5f,  0.5f,  0.5f,
+        -0.5f, -0.5f, 0.5f,  0.5f, -0.5f, 0.5f,  0.5f, 0.5f, 0.5f,
+        -0.5f, -0.5f, 0.5f,  0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
         // back
-         0.5f, -0.5f, -0.5f,  -0.5f, -0.5f, -0.5f,  -0.5f,  0.5f, -0.5f,
-         0.5f, -0.5f, -0.5f,  -0.5f,  0.5f, -0.5f,   0.5f,  0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f,
+        0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f,  0.5f, 0.5f, -0.5f,
         // left
-        -0.5f, -0.5f, -0.5f,  -0.5f, -0.5f,  0.5f,  -0.5f,  0.5f,  0.5f,
-        -0.5f, -0.5f, -0.5f,  -0.5f,  0.5f,  0.5f,  -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f,
+        -0.5f, -0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, -0.5f,
         // right
-         0.5f, -0.5f,  0.5f,   0.5f, -0.5f, -0.5f,   0.5f,  0.5f, -0.5f,
-         0.5f, -0.5f,  0.5f,   0.5f,  0.5f, -0.5f,   0.5f,  0.5f,  0.5f,
+        0.5f, -0.5f, 0.5f,  0.5f, -0.5f, -0.5f,  0.5f, 0.5f, -0.5f,
+        0.5f, -0.5f, 0.5f,  0.5f, 0.5f, -0.5f,  0.5f, 0.5f, 0.5f,
         // top
-        -0.5f,  0.5f,  0.5f,   0.5f,  0.5f,  0.5f,   0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f,  0.5f,   0.5f,  0.5f, -0.5f,  -0.5f,  0.5f, -0.5f,
+        -0.5f, 0.5f, 0.5f,  0.5f, 0.5f, 0.5f,  0.5f, 0.5f, -0.5f,
+        -0.5f, 0.5f, 0.5f,  0.5f, 0.5f, -0.5f, -0.5f, 0.5f, -0.5f,
         // bottom
-        -0.5f, -0.5f, -0.5f,   0.5f, -0.5f, -0.5f,   0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f, -0.5f,   0.5f, -0.5f,  0.5f,  -0.5f, -0.5f,  0.5f,
-    };
+        -0.5f, -0.5f, -0.5f,  0.5f, -0.5f, -0.5f,  0.5f, -0.5f, 0.5f,
+        -0.5f, -0.5f, -0.5f,  0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f,
+    };*/
     // clang-format on
 
-    GLuint vao, vbo;
+    GLuint vao/*, vbo*/;
     glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
+    //glGenBuffers(1, &vbo);
     glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(LOCATION_POS);
-    glVertexAttribPointer(LOCATION_POS, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    //glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    //glEnableVertexAttribArray(LOCATION_POS);
+    //glVertexAttribPointer(LOCATION_POS, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
     return vao;
 }
 
@@ -87,6 +87,14 @@ static GLuint create_fbo(int w, int h)
     return fbo;
 }
 
+typedef struct
+{
+    int face;
+    VEC3(float) position;
+} block_face;
+
+#define INSTANCE_COUNT 6
+
 static void render(GLuint fbo, GLuint prog, GLuint cube_vao, GLuint mvp_ubo)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -99,7 +107,7 @@ static void render(GLuint fbo, GLuint prog, GLuint cube_vao, GLuint mvp_ubo)
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mvp_model), mvp);
 
     glBindVertexArray(cube_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, INSTANCE_COUNT);
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -139,6 +147,30 @@ int main(void)
     bind_uniform_buffer(&mvp_ubo, BINDING_MVP, mvp, sizeof(mvp_model));
 
     double last_t = glfwGetTime();
+
+    block_face instances[INSTANCE_COUNT] = {
+        (block_face){ 0, (VEC3(float)){ 0, 0, 0 } },
+        (block_face){ 1, (VEC3(float)){ 0, 0, 0 } },
+        (block_face){ 2, (VEC3(float)){ 0, 0, 0 } },
+        (block_face){ 3, (VEC3(float)){ 0, 0, 0 } },
+        (block_face){ 4, (VEC3(float)){ 0, 0, 0 } },
+        (block_face){ 5, (VEC3(float)){ 0, 0, 0 } },
+    };
+
+    GLuint instances_vbo;
+    glGenBuffers(1, &instances_vbo);
+
+    glBindVertexArray(cube_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(block_face) * INSTANCE_COUNT, instances, GL_STATIC_DRAW);
+
+    glVertexAttribIPointer(0, 1, GL_INT,   sizeof(block_face), (void*)offsetof(block_face, face));
+    glEnableVertexAttribArray(0);
+    glVertexAttribDivisor(0, 1);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(block_face), (void*)offsetof(block_face, position));
+    glEnableVertexAttribArray(1);
+    glVertexAttribDivisor(1, 1);
 
     while (!glfwWindowShouldClose(win))
     {
