@@ -70,17 +70,18 @@ chunk_to_faces(const Chunk* c, MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) face_in
                         VEC3(i64) neighbor_chunk_pos = VEC3_ADD(dirs[f], c->pos);
 
                         ChunkPtr* neighbor = MAP_GET_T(ChunkPos, ChunkPtr, *w, neighbor_chunk_pos);
-                        if (neighbor)
-                        {
-                            VEC3(u8)
-                            local = {
-                                dirs[f].x == 1 ? 0 : (dirs[f].x == -1 ? CHUNK_SIZE - 1 : x),
-                                dirs[f].y == 1 ? 0 : (dirs[f].y == -1 ? CHUNK_SIZE - 1 : y),
-                                dirs[f].z == 1 ? 0 : (dirs[f].z == -1 ? CHUNK_SIZE - 1 : z),
-                            };
-                            if (chunk_get(*neighbor, local)->type != BLK_AIR)
-                                continue;
-                        }
+
+                        if (!neighbor)
+                            continue;
+
+                        VEC3(u8)
+                        local = {
+                            dirs[f].x == 1 ? 0 : (dirs[f].x == -1 ? CHUNK_SIZE - 1 : x),
+                            dirs[f].y == 1 ? 0 : (dirs[f].y == -1 ? CHUNK_SIZE - 1 : y),
+                            dirs[f].z == 1 ? 0 : (dirs[f].z == -1 ? CHUNK_SIZE - 1 : z),
+                        };
+                        if (chunk_get(*neighbor, local)->type != BLK_AIR)
+                            continue;
                     }
 
                     Face face = (Face){
