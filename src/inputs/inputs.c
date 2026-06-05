@@ -27,10 +27,10 @@ void cursor_callback(GLFWwindow* window, double xpos, double ypos)
     double dx = xpos - state->mouse_x;
     double dy = ypos - state->mouse_y;
 
-    state->cam_yaw += (float)dx * CAM_SENSITIVITY;
-    state->cam_pitch += (float)dy * CAM_SENSITIVITY;
+    state->w->player->cam_yaw += (float)dx * CAM_SENSITIVITY;
+    state->w->player->cam_pitch += (float)dy * CAM_SENSITIVITY;
 
-    state->cam_pitch = CLAMP(state->cam_pitch, -CAM_PITCH_LIMIT, CAM_PITCH_LIMIT);
+    state->w->player->cam_pitch = CLAMP(state->w->player->cam_pitch, -CAM_PITCH_LIMIT, CAM_PITCH_LIMIT);
 
     state->mouse_x = xpos;
     state->mouse_y = ypos;
@@ -38,10 +38,10 @@ void cursor_callback(GLFWwindow* window, double xpos, double ypos)
 
 void update_camera(GLFWwindow* window, AppState* state, float dt)
 {
-    float cyaw = cosf(-state->cam_yaw);
-    float syaw = sinf(-state->cam_yaw);
-    float cpitch = cosf(state->cam_pitch);
-    float spitch = sinf(state->cam_pitch);
+    float cyaw = cosf(-state->w->player->cam_yaw);
+    float syaw = sinf(-state->w->player->cam_yaw);
+    float cpitch = cosf(state->w->player->cam_pitch);
+    float spitch = sinf(state->w->player->cam_pitch);
 
     float step = CAM_SPEED * dt;
 

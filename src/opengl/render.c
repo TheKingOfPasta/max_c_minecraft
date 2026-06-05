@@ -1,7 +1,9 @@
 #include "render.h"
+#include <math.h>
 
 #include "mvp_model.h"
 #include "utils/container.h"
+#include "voxel/chunk.h"
 #include "voxel/world.h"
 
 static void create_draw_call_list(World* w)
@@ -10,10 +12,23 @@ static void create_draw_call_list(World* w)
     VECTOR_INIT(w->drawn_chunks);
     VECTOR_RESIZE(w->drawn_chunks, w->chunks.size / 3);
 
+    VEC3(float) cam_dir = (VEC3(float)){ sin(w->player->cam_yaw), -sin(w->player->cam_pitch), cos(w->player->cam_yaw) };
+
     MAP_FOR_EACH(w->chunks, IT)
     {
         ChunkPtr c = (*IT).value;
-        if (c->face_count != 0)
+
+        if (c->face_count == 0)
+            continue;
+
+        VEC3(float) chunk_center = (VEC3(float)){ (0.5 + c->pos.x) * CHUNK_SIZE, (0.5 + c->pos.y) * CHUNK_SIZE, (0.5 + c->pos.z) * CHUNK_SIZE };
+        VEC3(float) diff = VEC3_SUB(chunk_center, w->player->pos);
+        float length = sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
+
+        float one_over_length = 1.0f / length;
+        VEC3_SCALE_INPLACE(diff, one_over_length);
+
+        if (length < CHUNK_SIZE * 4 || VEC3_EQ(w->old_chunk_pos, c->pos) || VEC3_DOT(cam_dir, diff) > -0.2)
         {
             VECTOR_PUSH_BACK(w->drawn_chunks, ((DrawInstance){ 6, c->face_count, 0, c->face_start_index }));
         }

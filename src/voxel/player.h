@@ -5,4 +5,6 @@
 typedef struct
 {
     VEC3(float) pos;
+    float cam_pitch;
+    float cam_yaw;
 } Player;

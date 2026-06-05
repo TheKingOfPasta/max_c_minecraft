@@ -61,8 +61,6 @@ int main(void)
 
     AppState state = {
         .mouse_initialized = false,
-        .cam_pitch = 0.0f,
-        .cam_yaw = 0.0f,
     };
 
     GLFWwindow* win = init_window(&state);
@@ -99,7 +97,7 @@ int main(void)
         last_t = t0;
 
         update_camera(win, &state, dt);
-        mat4_view_from_camera(mvp->view, state.w->player->pos, state.cam_pitch, state.cam_yaw);
+        mat4_view_from_camera(mvp->view, state.w->player->pos, state.w->player->cam_pitch, state.w->player->cam_yaw);
 
         generate_new_chunks(&w, cube_vao, &face_count);
 

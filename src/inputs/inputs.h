@@ -17,8 +17,6 @@ typedef struct AppState
     bool mouse_initialized;
     double mouse_x;
     double mouse_y;
-    float cam_pitch;
-    float cam_yaw;
     World* w;
 } AppState;
 
