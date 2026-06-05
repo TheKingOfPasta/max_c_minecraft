@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "opengl/tracy.h"
 #include "utils/container.h"
 #include "utils/vec3.h"
 #include "voxel/chunk.h"
@@ -37,7 +38,7 @@ static void add_missing_chunk(World* w, VEC3(i64) pos)
     MAP_INSERT_T(ChunkPos, ChunkPtr, w->chunks, pos, c);
 }
 
-static void regenerate_faces_buffer([[maybe_unused]]World* w, GLuint vao, size_t* face_count)
+static void regenerate_faces_buffer([[maybe_unused]] World* w, GLuint vao, size_t* face_count)
 {
     glBindVertexArray(vao);
 
@@ -52,135 +53,143 @@ static void generate_new_chunks_border(World* w, VEC3(i64) diff)
     if (diff.x > 0)
     {
         for (i64 z = -LOADED_CHUNK_DISTANCE; z <= LOADED_CHUNK_DISTANCE; z++)
-        for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
-        for (i64 x = LOADED_CHUNK_DISTANCE + 1; x <= LOADED_CHUNK_DISTANCE + diff.x; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
+            for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
+                for (i64 x = LOADED_CHUNK_DISTANCE + 1; x <= LOADED_CHUNK_DISTANCE + diff.x; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
 
-            add_missing_chunk(w, pos);
-        }
+                    add_missing_chunk(w, pos);
+                }
         for (i64 z = -LOADED_CHUNK_DISTANCE; z <= LOADED_CHUNK_DISTANCE; z++)
-        for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
-        for (i64 x = LOADED_CHUNK_DISTANCE + 1; x <= LOADED_CHUNK_DISTANCE + diff.x; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
+            for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
+                for (i64 x = LOADED_CHUNK_DISTANCE + 1; x <= LOADED_CHUNK_DISTANCE + diff.x; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
 
-            face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos), &w->chunks, face_instances);
-        }
+                    face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos),
+                                                    &w->chunks, face_instances);
+                }
     }
     else if (diff.x < 0)
     {
         for (i64 z = -LOADED_CHUNK_DISTANCE; z <= LOADED_CHUNK_DISTANCE; z++)
-        for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
-        for (i64 x = -LOADED_CHUNK_DISTANCE + diff.x; x <= -LOADED_CHUNK_DISTANCE - 1; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
+            for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
+                for (i64 x = -LOADED_CHUNK_DISTANCE + diff.x; x <= -LOADED_CHUNK_DISTANCE - 1; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
 
-            add_missing_chunk(w, pos);
-        }
+                    add_missing_chunk(w, pos);
+                }
         for (i64 z = -LOADED_CHUNK_DISTANCE; z <= LOADED_CHUNK_DISTANCE; z++)
-        for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
-        for (i64 x = -LOADED_CHUNK_DISTANCE + diff.x; x <= -LOADED_CHUNK_DISTANCE - 1; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
+            for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
+                for (i64 x = -LOADED_CHUNK_DISTANCE + diff.x; x <= -LOADED_CHUNK_DISTANCE - 1; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
 
-            face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos), &w->chunks, face_instances);
-        }
+                    face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos),
+                                                    &w->chunks, face_instances);
+                }
     }
 
     if (diff.y > 0)
     {
         for (i64 z = -LOADED_CHUNK_DISTANCE; z <= LOADED_CHUNK_DISTANCE; z++)
-        for (i64 y = LOADED_CHUNK_DISTANCE + 1; y <= LOADED_CHUNK_DISTANCE + diff.y; y++)
-        for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
+            for (i64 y = LOADED_CHUNK_DISTANCE + 1; y <= LOADED_CHUNK_DISTANCE + diff.y; y++)
+                for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
 
-            add_missing_chunk(w, pos);
-        }
+                    add_missing_chunk(w, pos);
+                }
         for (i64 z = -LOADED_CHUNK_DISTANCE; z <= LOADED_CHUNK_DISTANCE; z++)
-        for (i64 y = LOADED_CHUNK_DISTANCE + 1; y <= LOADED_CHUNK_DISTANCE + diff.y; y++)
-        for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
+            for (i64 y = LOADED_CHUNK_DISTANCE + 1; y <= LOADED_CHUNK_DISTANCE + diff.y; y++)
+                for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
 
-            face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos), &w->chunks, face_instances);
-        }
+                    face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos),
+                                                    &w->chunks, face_instances);
+                }
     }
     else if (diff.y < 0)
     {
         for (i64 z = -LOADED_CHUNK_DISTANCE; z <= LOADED_CHUNK_DISTANCE; z++)
-        for (i64 y = -LOADED_CHUNK_DISTANCE + diff.y; y <= -LOADED_CHUNK_DISTANCE - 1; y++)
-        for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
+            for (i64 y = -LOADED_CHUNK_DISTANCE + diff.y; y <= -LOADED_CHUNK_DISTANCE - 1; y++)
+                for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
 
-            add_missing_chunk(w, pos);
-        }
+                    add_missing_chunk(w, pos);
+                }
         for (i64 z = -LOADED_CHUNK_DISTANCE; z <= LOADED_CHUNK_DISTANCE; z++)
-        for (i64 y = -LOADED_CHUNK_DISTANCE + diff.y; y <= -LOADED_CHUNK_DISTANCE - 1; y++)
-        for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
+            for (i64 y = -LOADED_CHUNK_DISTANCE + diff.y; y <= -LOADED_CHUNK_DISTANCE - 1; y++)
+                for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
 
-            face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos), &w->chunks, face_instances);
-        }
+                    face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos),
+                                                    &w->chunks, face_instances);
+                }
     }
 
     if (diff.z > 0)
     {
         for (i64 z = LOADED_CHUNK_DISTANCE + 1; z <= LOADED_CHUNK_DISTANCE + diff.z; z++)
-        for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
-        for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
+            for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
+                for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
 
-            add_missing_chunk(w, pos);
-        }
+                    add_missing_chunk(w, pos);
+                }
         for (i64 z = LOADED_CHUNK_DISTANCE + 1; z <= LOADED_CHUNK_DISTANCE + diff.z; z++)
-        for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
-        for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
+            for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
+                for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
 
-            face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos), &w->chunks, face_instances);
-        }
+                    face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos),
+                                                    &w->chunks, face_instances);
+                }
     }
     else if (diff.z < 0)
     {
         for (i64 z = -LOADED_CHUNK_DISTANCE + diff.z; z <= -LOADED_CHUNK_DISTANCE - 1; z++)
-        for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
-        for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
+            for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
+                for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
 
-            add_missing_chunk(w, pos);
-        }
+                    add_missing_chunk(w, pos);
+                }
         for (i64 z = -LOADED_CHUNK_DISTANCE + diff.z; z <= -LOADED_CHUNK_DISTANCE - 1; z++)
-        for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
-        for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
+            for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
+                for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, w->old_chunk_pos);
 
-            face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos), &w->chunks, face_instances);
-        }
+                    face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos),
+                                                    &w->chunks, face_instances);
+                }
     }
 }
 
 void generate_new_chunks(World* w, GLuint vao, size_t* face_count)
 {
+    TracyZone(ctx, "generate_chunks");
+
     VEC3(i64)
     player_chunk_pos =
         (VEC3(i64)){ ((i64)w->player->pos.x / CHUNK_SIZE), ((i64)w->player->pos.y / CHUNK_SIZE),
@@ -191,40 +200,51 @@ void generate_new_chunks(World* w, GLuint vao, size_t* face_count)
     Chunk** c = MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, player_chunk_pos);
 
     if (c != NULL && (*c)->visited)
+    {
+        TracyZoneEnd(ctx);
         return;
+    }
 
     if (!c)
     {
+        TracyZone(ctx_init, "initial_gen");
         printf("Generating all surrounding chunks\n");
         for (i64 z = -LOADED_CHUNK_DISTANCE; z <= LOADED_CHUNK_DISTANCE; z++)
-        for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
-        for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, player_chunk_pos);
+            for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
+                for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, player_chunk_pos);
 
-            add_missing_chunk(w, pos);
-        }
+                    add_missing_chunk(w, pos);
+                }
         for (i64 z = -LOADED_CHUNK_DISTANCE; z <= LOADED_CHUNK_DISTANCE; z++)
-        for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
-        for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
-        {
-            VEC3(i64) pos = { x, y, z };
-            VEC3_ADD_INPLACE(&pos, player_chunk_pos);
+            for (i64 y = -LOADED_CHUNK_DISTANCE; y <= LOADED_CHUNK_DISTANCE; y++)
+                for (i64 x = -LOADED_CHUNK_DISTANCE; x <= LOADED_CHUNK_DISTANCE; x++)
+                {
+                    VEC3(i64) pos = { x, y, z };
+                    VEC3_ADD_INPLACE(&pos, player_chunk_pos);
 
-            face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos), &w->chunks, face_instances);
-        }
+                    face_instances = chunk_to_faces(*MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, pos),
+                                                    &w->chunks, face_instances);
+                }
+        TracyZoneEnd(ctx_init);
 
         c = MAP_GET_T(ChunkPos, ChunkPtr, w->chunks, player_chunk_pos);
     }
     else
     {
+        TracyZone(ctx_border, "border_gen");
         generate_new_chunks_border(w, diff);
+        TracyZoneEnd(ctx_border);
     }
 
     w->old_chunk_pos = player_chunk_pos;
-
     (*c)->visited = true;
 
+    TracyZone(ctx_faces, "regen_faces");
     regenerate_faces_buffer(w, vao, face_count);
+    TracyZoneEnd(ctx_faces);
+
+    TracyZoneEnd(ctx);
 }

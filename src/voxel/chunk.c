@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "block.h"
+#include "opengl/tracy.h"
 #include "utils/vec3.h"
 
 Chunk* create_empty_chunk(VEC3(i64) pos)

@@ -6,12 +6,15 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "inputs/inputs.h"
+#include "opengl/instances.h"
 #include "opengl/mvp_model.h"
+#include "opengl/render.h"
 #include "opengl/shader_compile.h"
+#include "opengl/tracy.h"
+#include "utils/bench.h"
 #include "voxel/textures/array_texture.h"
 #include "voxel/world.h"
-#include "opengl/render.h"
-#include "opengl/instances.h"
 
 static void init_mvp(void)
 {
@@ -53,31 +56,29 @@ static GLuint create_fbo(int w, int h)
     return fbo;
 }
 
-int main(void)
+int main(int argc, char** argv)
 {
     srand(time(NULL));
 
+    Bench bench = bench_parse_args(argc, argv);
+
     init_mvp();
 
-    AppState state = {
-        .mouse_initialized = false,
-    };
-
+    AppState state = { .mouse_initialized = false };
     GLFWwindow* win = init_window(&state);
 
     GLuint render_prog =
         create_program(compile_shader(GL_VERTEX_SHADER, "src/shaders/shader.vert"),
                        compile_shader(GL_FRAGMENT_SHADER, "src/shaders/shader.frag"));
 
-    GLuint cube_vao = create_cube_vao();
+    GLuint vao = create_cube_vao();
     GLuint fbo = create_fbo(WIN_W, WIN_H);
 
     texture_array_init();
 
     GLuint mvp_ubo;
     bind_uniform_buffer(&mvp_ubo, BINDING_MVP, mvp, sizeof(mvp_model));
-
-    GLuint instances_vbo = describe_faces(cube_vao);
+    describe_faces(vao);
 
     double last_t = glfwGetTime();
 
@@ -85,10 +86,14 @@ int main(void)
     state.w = &w;
 
     size_t face_count;
-    generate_new_chunks(&w, cube_vao, &face_count);
+    generate_new_chunks(&w, vao, &face_count);
 
     GLuint draw_instances_vbo;
     glGenBuffers(1, &draw_instances_vbo);
+
+    TracyGlInit();
+
+    BenchStats hud = { 0 };
 
     while (!glfwWindowShouldClose(win))
     {
@@ -96,15 +101,33 @@ int main(void)
         float dt = (float)(t0 - last_t);
         last_t = t0;
 
-        update_camera(win, &state, dt);
-        mat4_view_from_camera(mvp->view, state.w->player->pos, state.w->player->cam_pitch, state.w->player->cam_yaw);
+        TracyZone(ctx_input, "input");
+        if (bench.active)
+        {
+            bench_update(&bench, &w, dt);
+            if (bench.phase == BENCH_PHASE_DONE)
+            {
+                TracyZoneEnd(ctx_input);
+                break;
+            }
+        }
+        else
+            update_camera(win, &state, dt);
+        TracyZoneEnd(ctx_input);
 
-        generate_new_chunks(&w, cube_vao, &face_count);
+        mat4_view_from_camera(mvp->view, w.player->pos, w.player->cam_pitch, w.player->cam_yaw);
 
+        TracyZone(ctx_chunks, "chunk_gen");
+        generate_new_chunks(&w, vao, &face_count);
+        TracyZoneEnd(ctx_chunks);
+
+        TracyGlZone("render");
         render(fbo, render_prog, mvp_ubo, &w, draw_instances_vbo);
+        TracyGlZoneEnd();
+        TracyGlCollect(); // mark one frame
 
-        printf("\r%f                        ", 1.0 / dt);
-        fflush(stdout);
+        bench_hud(&hud, dt, (int)w.drawn_chunks.size, (int)w.chunks.size);
+        TRACY_FRAME_MARK;
 
         glfwSwapBuffers(win);
         glfwPollEvents();

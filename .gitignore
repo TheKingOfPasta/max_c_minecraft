@@ -1,3 +1,10 @@
+#perf stuff
+perf.data*
+max_c_minecraft_profile
+trace.tracy
+flame.svg
+
+
 max_c_minecraft
 .envrc
 .direnv

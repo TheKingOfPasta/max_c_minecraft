@@ -8,13 +8,11 @@ GLuint describe_faces(GLuint cube_vao)
     glBindVertexArray(cube_vao);
     glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
 
-    glVertexAttribIPointer(0, 1, GL_INT,   sizeof(Face), (void*)offsetof(Face, face_id));
+    glVertexAttribIPointer(0, 1, GL_INT, sizeof(Face), (void*)offsetof(Face, face_id));
     glEnableVertexAttribArray(0);
     glVertexAttribDivisor(0, 1);
 
-
-    glVertexAttribIPointer(1, 1, GL_INT, sizeof(Face),
-                           (void*)offsetof(Face, texture_id));
+    glVertexAttribIPointer(1, 1, GL_INT, sizeof(Face), (void*)offsetof(Face, texture_id));
 
     glEnableVertexAttribArray(1);
     glVertexAttribDivisor(1, 1);

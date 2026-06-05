@@ -19,10 +19,13 @@
         pkgs.shaderc
 
         pkgs.ccache
+
+        pkgs.tracy
       ];
 
       shellHook = ''
         echo boooo
+        export TRACY_DIR="${pkgs.tracy}"
       '';
     };
   };

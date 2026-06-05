@@ -2,6 +2,7 @@
 
 #include "mvp_model.h"
 #include "utils/container.h"
+#include "opengl/tracy.h"
 #include "utils/vec3.h"
 #include "voxel/chunk.h"
 #include "voxel/world.h"
@@ -89,8 +90,13 @@ void render(GLuint fbo, GLuint prog, GLuint mvp_ubo, World* w, GLuint draw_insta
     glBindBuffer(GL_UNIFORM_BUFFER, mvp_ubo);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mvp_model), mvp);
 
+    TracyZone(ctx_cull, "frustum_cull");
     create_draw_call_list(w);
+    TracyZoneEnd(ctx_cull);
+
+    TracyZone(ctx_draw, "draw_instances");
     draw_instances(w, draw_instances_vbo);
+    TracyZoneEnd(ctx_draw);
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
