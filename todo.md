@@ -31,13 +31,13 @@
     - [ ] Collision
 
 - [ ] terrain Gen
-    - [ ] generate on demand
-    - [ ] not on cpu gen
-    - [ ] simple height map terrain
+    - [X] generate on demand
+    - [ ] not on main cpu thread gen
+    - [X] simple height map terrain
     - [ ] proper layered noise
     - [ ] generate structure
     - [ ] biome
-    - [ ] proper structure for noise layer
+    - [ ] proper structure for noise layer description
     - [ ] use rastringin function for island
 
 - Visual effect
