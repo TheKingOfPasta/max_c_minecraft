@@ -42,7 +42,7 @@ static void regenerate_faces_buffer([[maybe_unused]]World* w, GLuint vao, size_t
     glBindVertexArray(vao);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(Face) * VECTOR_SIZE(face_instances), face_instances.data,
-                 GL_STATIC_DRAW);
+                 GL_DYNAMIC_DRAW);
 
     *face_count = face_instances.size;
 }
