@@ -11,8 +11,11 @@ typedef enum BlockType : uint16_t
     BLK_DIRT,
     BLK_STONE,
     BLK_OAK,
+    BLK_FOLIAGE,
     BLK_SAND,
+    BLK_RED_SAND,
     BLK_GRAVEL,
+    BLK_SNOW,
     BLOCK_COUNT
 } BlockType;
 
