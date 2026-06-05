@@ -42,8 +42,11 @@ static bool chunk_is_in_bound(VEC3(u8) pos)
 }
 
 VECTOR(Face)
-chunk_to_faces(const Chunk* c, MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) face_instances)
+chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) face_instances)
 {
+    c->face_start_index = face_instances.size;
+    c->face_count = 0;
+
     static const VEC3(i64) dirs[6] = {
         { 1, 0, 0 }, { -1, 0, 0 }, { 0, 1, 0 }, { 0, -1, 0 }, { 0, 0, 1 }, { 0, 0, -1 },
     };
@@ -91,6 +94,7 @@ chunk_to_faces(const Chunk* c, MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) face_in
                     };
 
                     VECTOR_PUSH_BACK(face_instances, face);
+                    c->face_count += 1;
                 }
             }
 
