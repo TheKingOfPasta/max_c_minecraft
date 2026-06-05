@@ -46,7 +46,7 @@ static void regenerate_faces_buffer([[maybe_unused]]World* w, GLuint vao, size_t
     *face_count = face_instances.size;
 }
 
-void generate_new_chunks_partial(World* w, VEC3(i64) diff)
+static void generate_new_chunks_border(World* w, VEC3(i64) diff)
 {
     if (diff.x > 0)
     {
@@ -218,7 +218,7 @@ void generate_new_chunks(World* w, GLuint vao, size_t* face_count)
     }
     else
     {
-        generate_new_chunks_partial(w, diff);
+        generate_new_chunks_border(w, diff);
     }
 
     w->old_chunk_pos = player_chunk_pos;
