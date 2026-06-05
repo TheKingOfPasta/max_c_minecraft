@@ -16,6 +16,7 @@ typedef struct
 {
     MAP(ChunkPos, ChunkPtr) chunks;
     Player* player;
+    VEC3(i64) old_chunk_pos;
 } World;
 
 World init_world(void);
