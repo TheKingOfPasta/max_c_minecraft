@@ -29,6 +29,12 @@
 #define VECTOR_SIZE(VEC) (VEC).size
 #define VECTOR_GET(VEC, INDEX) (VEC).data[(INDEX)]
 #define VECTOR_TYPE(VEC) typeof(*(VEC).data)
+#define VECTOR_RESIZE(VEC, n)                                                  \
+    do                                                                         \
+    {                                                                          \
+        (VEC).capacity = n;                                                    \
+        (VEC).data = realloc((VEC).data, n * sizeof(*(VEC).data));                        \
+    } while (0);
 
 #define VECTOR_FOR_EACH(VEC, ITR)                                              \
     for (auto ITR = VECTOR_BEGIN(VEC); ITR != VECTOR_END(VEC);                 \

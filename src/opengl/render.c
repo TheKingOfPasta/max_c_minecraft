@@ -6,7 +6,9 @@
 
 static void create_draw_call_list(World* w)
 {
+    VECTOR_FREE(w->drawn_chunks);
     VECTOR_INIT(w->drawn_chunks);
+    VECTOR_RESIZE(w->drawn_chunks, w->chunks.size / 3);
 
     MAP_FOR_EACH(w->chunks, IT)
     {
