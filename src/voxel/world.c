@@ -34,19 +34,11 @@ static void add_missing_chunk(World* w, VEC3(i64) pos)
     gen_terrain(42, c);
 
     MAP_INSERT_T(ChunkPos, ChunkPtr, w->chunks, pos, c);
-    //face_instances = chunk_to_faces(c, &w->chunks, face_instances);
 }
 
 static void regenerate_faces_buffer([[maybe_unused]]World* w, GLuint vao, size_t* face_count)
 {
     glBindVertexArray(vao);
-
-    /*VECTOR_INIT(face_instances);
-
-    MAP_FOR_EACH(w->chunks, c)
-    {
-        face_instances = chunk_to_faces(c->value, &w->chunks, face_instances);
-    }*/
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(Face) * VECTOR_SIZE(face_instances), face_instances.data,
                  GL_STATIC_DRAW);
