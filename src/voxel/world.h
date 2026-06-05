@@ -14,9 +14,20 @@
 
 typedef struct
 {
+    GLuint count;
+    GLuint instanceCount;
+    GLuint first;
+    GLuint baseInstance;
+} DrawInstance;
+
+VECTOR_DECLARE(DrawInstance);
+
+typedef struct
+{
     MAP(ChunkPos, ChunkPtr) chunks;
     Player* player;
     VEC3(i64) old_chunk_pos;
+    VECTOR(DrawInstance) drawn_chunks;
 } World;
 
 World init_world(void);

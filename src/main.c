@@ -89,6 +89,9 @@ int main(void)
     size_t face_count;
     generate_new_chunks(&w, cube_vao, &face_count);
 
+    GLuint draw_instances_vbo;
+    glGenBuffers(1, &draw_instances_vbo);
+
     while (!glfwWindowShouldClose(win))
     {
         double t0 = glfwGetTime();
@@ -100,7 +103,7 @@ int main(void)
 
         generate_new_chunks(&w, cube_vao, &face_count);
 
-        render(fbo, render_prog, mvp_ubo, face_count);
+        render(fbo, render_prog, mvp_ubo, &w, draw_instances_vbo);
 
         printf("\r%f                        ", 1.0 / dt);
         fflush(stdout);

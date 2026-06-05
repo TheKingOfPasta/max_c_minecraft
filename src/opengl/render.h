@@ -5,4 +5,8 @@
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
-void render(GLuint fbo, GLuint prog, GLuint mvp_ubo, size_t face_count);
+#include "voxel/world.h"
+
+void render(GLuint fbo, GLuint prog, GLuint mvp_ubo, World* w, GLuint vbo);
+
+void draw_instances(World* w, GLuint vbo);

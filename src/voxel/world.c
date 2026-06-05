@@ -19,6 +19,7 @@ World init_world(void)
 
     VECTOR_INIT(w.chunks);
     VECTOR_INIT(face_instances);
+    VECTOR_INIT(w.drawn_chunks);
 
     return w;
 }

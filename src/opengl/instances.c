@@ -26,8 +26,3 @@ GLuint describe_faces(GLuint cube_vao)
 
     return instances_vbo;
 }
-
-void draw_instances(size_t face_count)
-{
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, face_count);
-}

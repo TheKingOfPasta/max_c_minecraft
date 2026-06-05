@@ -11,5 +11,3 @@
 VECTOR_DECLARE(Face);
 
 GLuint describe_faces(GLuint cube_vao);
-
-void draw_instances(size_t face_count);
