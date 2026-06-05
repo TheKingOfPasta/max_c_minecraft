@@ -5,8 +5,8 @@
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
-#include "voxel/face.h"
 #include "utils/container.h"
+#include "voxel/face.h"
 
 VECTOR_DECLARE(Face);
 

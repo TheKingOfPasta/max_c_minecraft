@@ -36,8 +36,7 @@ static uint32_t atlas_push(ArrayAtlas* a, uint8_t* rgba)
     return a->count - 1;
 }
 
-void atlas_push_from_base_texture(ArrayAtlas* a, BaseTextureEnum bid,
-                                  uint16_t frame_count)
+void atlas_push_from_base_texture(ArrayAtlas* a, BaseTextureEnum bid, uint16_t frame_count)
 {
     for (int i = 0; i < frame_count; i++)
         atlas_push(a, load_rgba(TexturePaths[bid + i]));

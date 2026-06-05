@@ -4,7 +4,6 @@
 // glad before
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
-
 #include <inputs/inputs.h>
 
 GLuint compile_shader(GLenum type, char* file_name);

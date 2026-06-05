@@ -30,7 +30,8 @@ void cursor_callback(GLFWwindow* window, double xpos, double ypos)
     state->w->player->cam_yaw += (float)dx * CAM_SENSITIVITY;
     state->w->player->cam_pitch += (float)dy * CAM_SENSITIVITY;
 
-    state->w->player->cam_pitch = CLAMP(state->w->player->cam_pitch, -CAM_PITCH_LIMIT, CAM_PITCH_LIMIT);
+    state->w->player->cam_pitch =
+        CLAMP(state->w->player->cam_pitch, -CAM_PITCH_LIMIT, CAM_PITCH_LIMIT);
 
     state->mouse_x = xpos;
     state->mouse_y = ypos;
