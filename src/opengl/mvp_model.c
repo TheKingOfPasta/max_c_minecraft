@@ -11,6 +11,17 @@ void mat4_identity(mat4 m)
     m[0] = m[5] = m[10] = m[15] = 1.0f;
 }
 
+void mat4_mul(mat4 out, const mat4 a, const mat4 b)
+{
+    for (int col = 0; col < 4; col++)
+        for (int row = 0; row < 4; row++)
+        {
+            out[col * 4 + row] = 0;
+            for (int k = 0; k < 4; k++)
+                out[col * 4 + row] += a[k * 4 + row] * b[col * 4 + k];
+        }
+}
+
 void mat4_perspective(mat4 m, float fov_y, float aspect, float znear, float zfar)
 {
     memset(m, 0, sizeof(mat4));

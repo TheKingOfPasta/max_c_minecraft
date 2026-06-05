@@ -1,10 +1,58 @@
 #include "render.h"
-#include <math.h>
 
 #include "mvp_model.h"
 #include "utils/container.h"
+#include "utils/vec3.h"
 #include "voxel/chunk.h"
 #include "voxel/world.h"
+
+typedef struct
+{
+    VEC3(float) n;
+    float w;
+} Plane;
+typedef struct
+{
+    Plane p[6];
+} Frustum;
+
+static Frustum frustum_extract(const mat4 proj, const mat4 view)
+{
+    mat4 vp;
+    mat4_mul(vp, proj, view);
+
+    return (Frustum){ .p = {
+                          { .n = { vp[0] + vp[3], vp[4] + vp[7], vp[8] + vp[11] },
+                            .w = vp[12] + vp[15] }, // left
+                          { .n = { vp[3] - vp[0], vp[7] - vp[4], vp[11] - vp[8] },
+                            .w = vp[15] - vp[12] }, // right
+                          { .n = { vp[1] + vp[3], vp[5] + vp[7], vp[9] + vp[11] },
+                            .w = vp[13] + vp[15] }, // bottom
+                          { .n = { vp[3] - vp[1], vp[7] - vp[5], vp[11] - vp[9] },
+                            .w = vp[15] - vp[13] }, // top
+                          { .n = { vp[2] + vp[3], vp[6] + vp[7], vp[10] + vp[11] },
+                            .w = vp[14] + vp[15] }, // near
+                          { .n = { vp[3] - vp[2], vp[7] - vp[6], vp[11] - vp[10] },
+                            .w = vp[15] - vp[14] }, // far
+                      } };
+}
+
+static bool aabb_in_frustum(const Frustum* f, VEC3(float) min, VEC3(float) max)
+{
+    for (int i = 0; i < 6; i++)
+    {
+        Plane p = f->p[i];
+        VEC3(float)
+        pv = {
+            p.n.x >= 0 ? max.x : min.x,
+            p.n.y >= 0 ? max.y : min.y,
+            p.n.z >= 0 ? max.z : min.z,
+        };
+        if (VEC3_DOT(p.n, pv) + p.w < 0)
+            return false;
+    }
+    return true;
+}
 
 static void create_draw_call_list(World* w)
 {
@@ -12,7 +60,7 @@ static void create_draw_call_list(World* w)
     VECTOR_INIT(w->drawn_chunks);
     VECTOR_RESIZE(w->drawn_chunks, w->chunks.size / 3);
 
-    VEC3(float) cam_dir = (VEC3(float)){ sin(w->player->cam_yaw), -sin(w->player->cam_pitch), cos(w->player->cam_yaw) };
+    Frustum f = frustum_extract(mvp->proj, mvp->view);
 
     MAP_FOR_EACH(w->chunks, IT)
     {
@@ -21,17 +69,12 @@ static void create_draw_call_list(World* w)
         if (c->face_count == 0)
             continue;
 
-        VEC3(float) chunk_center = (VEC3(float)){ (0.5 + c->pos.x) * CHUNK_SIZE, (0.5 + c->pos.y) * CHUNK_SIZE, (0.5 + c->pos.z) * CHUNK_SIZE };
-        VEC3(float) diff = VEC3_SUB(chunk_center, w->player->pos);
-        float length = sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
+        VEC3(float) min = VEC3_CAST(float, VEC3_SCALE(c->pos, CHUNK_SIZE));
+        VEC3(float) max = VEC3_ADD(min, ((VEC3(float)){ CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE }));
 
-        float one_over_length = 1.0f / length;
-        VEC3_SCALE_INPLACE(diff, one_over_length);
-
-        if (length < CHUNK_SIZE * 4 || VEC3_EQ(w->old_chunk_pos, c->pos) || VEC3_DOT(cam_dir, diff) > -0.2)
-        {
-            VECTOR_PUSH_BACK(w->drawn_chunks, ((DrawInstance){ 6, c->face_count, 0, c->face_start_index }));
-        }
+        if (aabb_in_frustum(&f, min, max))
+            VECTOR_PUSH_BACK(w->drawn_chunks,
+                             ((DrawInstance){ 6, c->face_count, 0, c->face_start_index }));
     }
 }
 
@@ -58,7 +101,8 @@ void render(GLuint fbo, GLuint prog, GLuint mvp_ubo, World* w, GLuint draw_insta
 void draw_instances(World* w, GLuint draw_instances_vbo)
 {
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, draw_instances_vbo);
-    glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(DrawInstance) * w->drawn_chunks.size, w->drawn_chunks.data, GL_DYNAMIC_DRAW);
+    glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(DrawInstance) * w->drawn_chunks.size,
+                 w->drawn_chunks.data, GL_DYNAMIC_DRAW);
 
     glMultiDrawArraysIndirect(GL_TRIANGLES, 0, w->drawn_chunks.size, 0);
 }

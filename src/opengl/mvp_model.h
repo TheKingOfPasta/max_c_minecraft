@@ -18,5 +18,6 @@ extern mvp_model* mvp;
 #define FOV_Y (3.14159265f / 2.0f)
 
 void mat4_identity(mat4 m);
+void mat4_mul(mat4 out, const mat4 a, const mat4 b);
 void mat4_perspective(mat4 m, float fov_y, float aspect, float znear, float zfar);
 void mat4_view_from_camera(mat4 m, VEC3(float) pos, float pitch, float yaw);
