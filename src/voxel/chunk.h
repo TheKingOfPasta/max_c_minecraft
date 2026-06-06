@@ -39,6 +39,7 @@ static inline bool chunkpos_eq(ChunkPos a, ChunkPos b)
 }
 
 MAP_DECLARE(ChunkPos, ChunkPtr, chunkpos_hash, chunkpos_eq);
+VECTOR_DECLARE(ChunkPtr);
 
 static inline VEC3(i64) chunk_local_to_world(VEC3(i64) chunk_pos, VEC3(u8) local)
 {

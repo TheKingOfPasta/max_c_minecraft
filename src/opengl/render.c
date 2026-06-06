@@ -57,18 +57,13 @@ static bool aabb_in_frustum(const Frustum* f, VEC3(float) min, VEC3(float) max)
 
 static void create_draw_call_list(World* w)
 {
-    VECTOR_FREE(w->drawn_chunks);
-    VECTOR_INIT(w->drawn_chunks);
-    VECTOR_RESIZE(w->drawn_chunks, w->chunks.size / 3);
+    w->drawn_chunks.size = 0;
 
     Frustum f = frustum_extract(mvp->proj, mvp->view);
 
-    MAP_FOR_EACH(w->chunks, IT)
+    VECTOR_FOR_EACH(w->meshed_chunks, it)
     {
-        ChunkPtr c = (*IT).value;
-
-        if (c->face_count == 0)
-            continue;
+        Chunk* c = *it;
 
         VEC3(float) min = VEC3_CAST(float, VEC3_SCALE(c->pos, CHUNK_SIZE));
         VEC3(float) max = VEC3_ADD(min, ((VEC3(float)){ CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE }));

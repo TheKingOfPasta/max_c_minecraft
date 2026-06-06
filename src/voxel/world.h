@@ -28,6 +28,7 @@ typedef struct
     MAP(ChunkPos, ChunkPtr) chunks;
     Player* player;
     VEC3(i64) old_chunk_pos;
+    VECTOR(ChunkPtr) meshed_chunks;
     VECTOR(DrawInstance) drawn_chunks;
     GLuint face_vbo;
     Face* mapped_faces;

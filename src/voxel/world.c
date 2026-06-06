@@ -21,6 +21,7 @@ World init_world(void)
     };
 
     VECTOR_INIT(w.chunks);
+    VECTOR_INIT(w.meshed_chunks);
     VECTOR_INIT(w.drawn_chunks);
 
     return w;
@@ -63,6 +64,8 @@ static void generate_slab(World* w, VEC3(i64) from, VEC3(i64) to)
                 {
                     chunk_to_faces(c, &w->chunks, w->mapped_faces, &w->gpu_face_count);
                     c->meshed = true;
+                    if (c->face_count > 0)
+                        VECTOR_PUSH_BACK(w->meshed_chunks, c);
                 }
             }
 }
