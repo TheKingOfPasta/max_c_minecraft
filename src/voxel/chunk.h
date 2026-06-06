@@ -15,7 +15,7 @@ typedef struct
 {
     VEC3(i64) pos;
 
-    bool visited;
+    bool meshed;
 
     size_t face_start_index;
     size_t face_count;

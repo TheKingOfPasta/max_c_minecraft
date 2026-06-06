@@ -82,6 +82,7 @@ static inline void border_block_faces(int x, int y, int z, Chunk* c, Chunk** nb,
 
 void chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, Face* buf, size_t* count)
 {
+    TracyZone(ctx, "chunk_to_face");
     c->face_start_index = *count;
 
     Chunk* nb[6];
@@ -137,4 +138,5 @@ void chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, Face* buf, size_t* co
 
     c->face_count = n - *count;
     *count = n;
+    TracyZoneEnd(ctx);
 }
