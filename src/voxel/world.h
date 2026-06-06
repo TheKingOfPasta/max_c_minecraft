@@ -23,18 +23,21 @@ typedef struct
 
 VECTOR_DECLARE(DrawInstance);
 
+typedef struct MeshWorker MeshWorker;
+
 typedef struct
 {
-    MAP(ChunkPos, ChunkPtr) chunks;
+    MeshWorker* worker;
+    bool initialized;
     Player* player;
     VEC3(i64) old_chunk_pos;
     VECTOR(ChunkPtr) meshed_chunks;
     VECTOR(DrawInstance) drawn_chunks;
     GLuint face_vbo;
-    Face* mapped_faces;
     size_t gpu_face_count;
 } World;
 
 World init_world(void);
 void world_init_gl(World* w, GLuint face_vbo);
+void world_integrate_results(World* w);
 void generate_new_chunks(World* w, GLuint vao, size_t* face_count);

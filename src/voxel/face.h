@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utils/container.h>
 #include <utils/vec3.h>
 
 typedef struct
@@ -8,3 +9,5 @@ typedef struct
     int face_id;
     VEC3(i32) pos;
 } Face;
+
+VECTOR_DECLARE(Face);

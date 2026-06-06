@@ -110,10 +110,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
         generate_new_chunks(&w, vao, &face_count);
         TracyZoneEnd(ctx_chunks);
 
+        world_integrate_results(&w);
+
         render(fbo, render_prog, mvp_ubo, &w, draw_instances_vbo);
         TracyGlCollect(); // mark one frame
 
-        bench_hud(&hud, dt, (int)w.drawn_chunks.size, (int)w.chunks.size);
+        bench_hud(&hud, dt, (int)w.drawn_chunks.size, (int)w.meshed_chunks.size);
         TRACY_FRAME_MARK;
 
         glfwSwapBuffers(win);

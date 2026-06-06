@@ -94,7 +94,7 @@ static inline int vertex_ao(int f, int v, VEC3(i32) wpos, MAP(ChunkPos, ChunkPtr
     return 3 - s1 - s2 - co;
 }
 
-static inline void emit_face(int f, const Block* b, VEC3(i32) wpos, Face* buf, size_t* n,
+static inline void emit_face(int f, const Block* b, VEC3(i32) wpos, VECTOR(Face) * buf,
                              MAP(ChunkPos, ChunkPtr) * w)
 {
     int ao0 = vertex_ao(f, 0, wpos, w);
@@ -102,15 +102,17 @@ static inline void emit_face(int f, const Block* b, VEC3(i32) wpos, Face* buf, s
     int ao2 = vertex_ao(f, 2, wpos, w);
     int ao3 = vertex_ao(f, 3, wpos, w);
     int flip = (ao0 + ao2 < ao1 + ao3) ? 1 : 0;
-    buf[(*n)++] = (Face){
-        .face_id = f | (flip << 3) | (ao0 << 4) | (ao1 << 6) | (ao2 << 8) | (ao3 << 10),
-        .texture_id = face_texture_resolve(&BlockFaces[b->type][f], 0, 0, 0),
-        .pos = wpos,
-    };
+    VECTOR_PUSH_BACK(
+        *buf,
+        ((Face){
+            .face_id = f | (flip << 3) | (ao0 << 4) | (ao1 << 6) | (ao2 << 8) | (ao3 << 10),
+            .texture_id = face_texture_resolve(&BlockFaces[b->type][f], 0, 0, 0),
+            .pos = wpos,
+        }));
 }
 
 static inline void border_block_faces(VEC3(i32) lpos, Chunk* c, Chunk** neighbours, VEC3(i32) base,
-                                      Face* buf, size_t* n, MAP(ChunkPos, ChunkPtr) * w)
+                                      VECTOR(Face) * buf, MAP(ChunkPos, ChunkPtr) * w)
 {
     const Block* b = &c->blocks[CHUNK_IDX(lpos.x, lpos.y, lpos.z)];
     if (b->type == BLK_AIR)
@@ -138,14 +140,13 @@ static inline void border_block_faces(VEC3(i32) lpos, Chunk* c, Chunk** neighbou
                 continue;
         }
 
-        emit_face(f, b, wpos, buf, n, w);
+        emit_face(f, b, wpos, buf, w);
     }
 }
 
-void chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, Face* buf, size_t* count)
+void chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) * buf)
 {
     TracyZone(ctx, "chunk_to_face");
-    c->face_start_index = *count;
 
     Chunk* nb[6];
     for (int f = 0; f < 6; f++)
@@ -155,9 +156,7 @@ void chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, Face* buf, size_t* co
     }
 
     VEC3(i32) base = VEC3_CAST(i32, VEC3_MUL(c->pos, CHUNK_SIZE));
-    size_t n = *count;
 
-    // inside the chunk
     for (int z = 1; z < CHUNK_SIZE - 1; z++)
         for (int y = 1; y < CHUNK_SIZE - 1; y++)
             for (int x = 1; x < CHUNK_SIZE - 1; x++)
@@ -173,31 +172,28 @@ void chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, Face* buf, size_t* co
                     VEC3(i32) nv = VEC3_ADD(lpos, dirs[f]);
                     if (c->blocks[CHUNK_IDX(nv.x, nv.y, nv.z)].type != BLK_AIR)
                         continue;
-                    emit_face(f, b, wpos, buf, &n, w);
+                    emit_face(f, b, wpos, buf, w);
                 }
             }
 
-    // border
     for (int z = 0; z < CHUNK_SIZE; z++)
         for (int y = 0; y < CHUNK_SIZE; y++)
         {
-            border_block_faces((VEC3(i32)){ 0, y, z }, c, nb, base, buf, &n, w);
-            border_block_faces((VEC3(i32)){ CHUNK_SIZE - 1, y, z }, c, nb, base, buf, &n, w);
+            border_block_faces((VEC3(i32)){ 0, y, z }, c, nb, base, buf, w);
+            border_block_faces((VEC3(i32)){ CHUNK_SIZE - 1, y, z }, c, nb, base, buf, w);
         }
     for (int z = 0; z < CHUNK_SIZE; z++)
         for (int x = 1; x < CHUNK_SIZE - 1; x++)
         {
-            border_block_faces((VEC3(i32)){ x, 0, z }, c, nb, base, buf, &n, w);
-            border_block_faces((VEC3(i32)){ x, CHUNK_SIZE - 1, z }, c, nb, base, buf, &n, w);
+            border_block_faces((VEC3(i32)){ x, 0, z }, c, nb, base, buf, w);
+            border_block_faces((VEC3(i32)){ x, CHUNK_SIZE - 1, z }, c, nb, base, buf, w);
         }
     for (int y = 1; y < CHUNK_SIZE - 1; y++)
         for (int x = 1; x < CHUNK_SIZE - 1; x++)
         {
-            border_block_faces((VEC3(i32)){ x, y, 0 }, c, nb, base, buf, &n, w);
-            border_block_faces((VEC3(i32)){ x, y, CHUNK_SIZE - 1 }, c, nb, base, buf, &n, w);
+            border_block_faces((VEC3(i32)){ x, y, 0 }, c, nb, base, buf, w);
+            border_block_faces((VEC3(i32)){ x, y, CHUNK_SIZE - 1 }, c, nb, base, buf, w);
         }
 
-    c->face_count = n - *count;
-    *count = n;
     TracyZoneEnd(ctx);
 }
