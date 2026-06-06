@@ -18,7 +18,9 @@
 #define VEC3_SUB(A, B) ((typeof(A)){ (A).x - (B).x, (A).y - (B).y, (A).z - (B).z })
 #define VEC3_MOD(A, K) ((typeof(A)){ (A).x % (K), (A).y % (K), (A).z % (K) })
 #define VEC3_DIV(A, K) ((typeof(A)){ (A).x / (K), (A).y / (K), (A).z / (K) })
-#define VEC3_SCALE(A, K) ((typeof(A)){ (A).x * (K), (A).y * (K), (A).z * (K) })
+#define VEC3_MUL(A, K) ((typeof(A)){ (A).x * (K), (A).y * (K), (A).z * (K) })
+#define VEC3_RBS(A, K) ((typeof(A)){ (A).x >> (K), (A).y >> (K), (A).z >> (K) })
+#define VEC3_AND(A, K) ((typeof(A)){ (A).x & (K), (A).y & (K), (A).z & (K) })
 
 #define VEC3_ADD_INPLACE(A, B)                                                                     \
     do                                                                                             \
@@ -42,7 +44,7 @@
         (A).y /= (K);                                                                              \
         (A).z /= (K);                                                                              \
     } while (0)
-#define VEC3_SCALE_INPLACE(A, K)                                                                   \
+#define VEC3_MUL_INPLACE(A, K)                                                                     \
     do                                                                                             \
     {                                                                                              \
         (A).x *= (K);                                                                              \

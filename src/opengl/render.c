@@ -65,7 +65,7 @@ static void create_draw_call_list(World* w)
     {
         Chunk* c = *it;
 
-        VEC3(float) min = VEC3_CAST(float, VEC3_SCALE(c->pos, CHUNK_SIZE));
+        VEC3(float) min = VEC3_CAST(float, VEC3_MUL(c->pos, CHUNK_SIZE));
         VEC3(float) max = VEC3_ADD(min, ((VEC3(float)){ CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE }));
 
         if (aabb_in_frustum(&f, min, max))

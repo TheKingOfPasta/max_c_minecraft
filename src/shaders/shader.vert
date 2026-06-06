@@ -11,6 +11,7 @@ layout(location = 1) in int   inTextureId;
 layout(location = 2) in ivec3 pos;
 
 layout(location = 0) out vec3 fragTexCoord;
+layout(location = 1) out float fragAO;
 
 
 const ivec3 faceOffsets[6][4] = {
@@ -31,12 +32,19 @@ const ivec2 faceUVs[6][4] = {
     {ivec2(1,1), ivec2(1,0), ivec2(0,0), ivec2(0,1)}, // -Z
 };
 
-const int quadIndices[6] = {0, 1, 2, 2, 3, 0};
+const int quadNormal[6] = {0, 1, 2, 2, 3, 0};
+const int quadFlipped[6] = {1, 2, 3, 3, 0, 1};
 
 void main() {
-    int v = quadIndices[gl_VertexID % 6];
+    int dir    = face & 7;
+    int flip   = (face >> 3) & 1;
+    int vi     = gl_VertexID % 6;
+    int v      = (flip != 0) ? quadFlipped[vi] : quadNormal[vi];
 
-    ivec3 worldPos = pos + faceOffsets[face][v];
+    int ao_val = (face >> (4 + v * 2)) & 3;
+    fragAO = mix(0.4, 1.0, float(ao_val) / 3.0);
+
+    ivec3 worldPos = pos + faceOffsets[dir][v];
     gl_Position  = ubo.proj * ubo.view * ubo.model * ivec4(worldPos, 1.0);
-    fragTexCoord = vec3(faceUVs[face][v], float(inTextureId));
+    fragTexCoord = vec3(faceUVs[dir][v], float(inTextureId));
 }
