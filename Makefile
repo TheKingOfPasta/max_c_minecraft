@@ -51,7 +51,8 @@ src/opengl/tracy.profile.o: src/opengl/tracy.cpp
 
 profile:
 	@[ -n "$(TRACY_DIR)" ] || { echo "error: TRACY_DIR not set :P"; exit 1; }
-	@$(TRACY_DIR)/bin/tracy-capture -o trace.tracy -f & sleep 0.5 && ./$(PROFILE_TARGET) --bench 10 10 && wait
+	$(MAKE) $(PROFILE_TARGET)
+	@$(TRACY_DIR)/bin/tracy-capture -o trace.tracy -f & sleep 0.5 && ./$(PROFILE_TARGET) && wait
 	@echo "open trace with: tracy trace.tracy"
 
 clean:

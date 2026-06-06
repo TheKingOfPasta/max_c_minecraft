@@ -56,11 +56,9 @@ static GLuint create_fbo(int w, int h)
     return fbo;
 }
 
-int main(int argc, char** argv)
+int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 {
     srand(time(NULL));
-
-    Bench bench = bench_parse_args(argc, argv);
 
     init_mvp();
 
@@ -102,17 +100,7 @@ int main(int argc, char** argv)
         last_t = t0;
 
         TracyZone(ctx_input, "input");
-        if (bench.active)
-        {
-            bench_update(&bench, &w, dt);
-            if (bench.phase == BENCH_PHASE_DONE)
-            {
-                TracyZoneEnd(ctx_input);
-                break;
-            }
-        }
-        else
-            update_camera(win, &state, dt);
+        update_camera(win, &state, dt);
         TracyZoneEnd(ctx_input);
 
         mat4_view_from_camera(mvp->view, w.player->pos, w.player->cam_pitch, w.player->cam_yaw);
@@ -121,9 +109,7 @@ int main(int argc, char** argv)
         generate_new_chunks(&w, vao, &face_count);
         TracyZoneEnd(ctx_chunks);
 
-        TracyGlZone("render");
         render(fbo, render_prog, mvp_ubo, &w, draw_instances_vbo);
-        TracyGlZoneEnd();
         TracyGlCollect(); // mark one frame
 
         bench_hud(&hud, dt, (int)w.drawn_chunks.size, (int)w.chunks.size);

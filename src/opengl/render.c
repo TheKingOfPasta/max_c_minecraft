@@ -87,8 +87,10 @@ void render(GLuint fbo, GLuint prog, GLuint mvp_ubo, World* w, GLuint draw_insta
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(prog);
+    TracyGlZone("mvp_upload");
     glBindBuffer(GL_UNIFORM_BUFFER, mvp_ubo);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(mvp_model), mvp);
+    TracyGlZoneEnd();
 
     TracyZone(ctx_cull, "frustum_cull");
     create_draw_call_list(w);
@@ -98,17 +100,23 @@ void render(GLuint fbo, GLuint prog, GLuint mvp_ubo, World* w, GLuint draw_insta
     draw_instances(w, draw_instances_vbo);
     TracyZoneEnd(ctx_draw);
 
+    TracyGlZone("fbo_blit");
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(0, 0, WIN_W, WIN_H, 0, 0, WIN_W, WIN_H, GL_COLOR_BUFFER_BIT, GL_LINEAR);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    TracyGlZoneEnd();
 }
 
 void draw_instances(World* w, GLuint draw_instances_vbo)
 {
+    TracyGlZone("draw_indirect_upload");
     glBindBuffer(GL_DRAW_INDIRECT_BUFFER, draw_instances_vbo);
     glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof(DrawInstance) * w->drawn_chunks.size,
                  w->drawn_chunks.data, GL_DYNAMIC_DRAW);
+    TracyGlZoneEnd();
 
+    TracyGlZone("draw_indirect");
     glMultiDrawArraysIndirect(GL_TRIANGLES, 0, w->drawn_chunks.size, 0);
+    TracyGlZoneEnd();
 }
