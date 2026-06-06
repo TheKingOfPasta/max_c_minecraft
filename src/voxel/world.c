@@ -46,9 +46,12 @@ static void add_missing_chunk(World* w, VEC3(i64) pos)
 
 static void generate_slab(World* w, VEC3(i64) from, VEC3(i64) to)
 {
-    for (i64 z = from.z; z <= to.z; z++)
-        for (i64 y = from.y; y <= to.y; y++)
-            for (i64 x = from.x; x <= to.x; x++)
+    // extend by 1 the generated radius so every meshed chunk's neighbors exist
+    VEC3(i64) efrom = VEC3_SUB(from, VEC3_SPLAT(i64, 1));
+    VEC3(i64) eto = VEC3_ADD(to, VEC3_SPLAT(i64, 1));
+    for (i64 z = efrom.z; z <= eto.z; z++)
+        for (i64 y = efrom.y; y <= eto.y; y++)
+            for (i64 x = efrom.x; x <= eto.x; x++)
                 add_missing_chunk(w, (VEC3(i64)){ x, y, z });
 
     for (i64 z = from.z; z <= to.z; z++)
