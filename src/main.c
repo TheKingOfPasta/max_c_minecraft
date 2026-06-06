@@ -76,12 +76,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char** argv)
 
     GLuint mvp_ubo;
     bind_uniform_buffer(&mvp_ubo, BINDING_MVP, mvp, sizeof(mvp_model));
-    describe_faces(vao);
+    GLuint face_vbo = describe_faces(vao);
 
     double last_t = glfwGetTime();
 
     World w = init_world();
     state.w = &w;
+    world_init_gl(&w, face_vbo);
 
     size_t face_count;
     generate_new_chunks(&w, vao, &face_count);

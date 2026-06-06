@@ -11,6 +11,7 @@
 #include "voxel/player.h"
 
 #define LOADED_CHUNK_DISTANCE 20
+#define MAX_FACE_COUNT ((size_t)1 << 23)
 
 typedef struct
 {
@@ -28,7 +29,11 @@ typedef struct
     Player* player;
     VEC3(i64) old_chunk_pos;
     VECTOR(DrawInstance) drawn_chunks;
+    GLuint face_vbo;
+    Face* mapped_faces;
+    size_t gpu_face_count;
 } World;
 
 World init_world(void);
+void world_init_gl(World* w, GLuint face_vbo);
 void generate_new_chunks(World* w, GLuint vao, size_t* face_count);

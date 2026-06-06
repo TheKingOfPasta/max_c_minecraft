@@ -51,15 +51,15 @@ void update_camera(GLFWwindow* window, AppState* state, float dt)
     VEC3(float) up = { .x = 0, .y = step, .z = 0 };
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        VEC3_ADD_INPLACE(&state->w->player->pos, fwd);
+        VEC3_ADD_INPLACE(state->w->player->pos, fwd);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        VEC3_SUB_INPLACE(&state->w->player->pos, fwd);
+        VEC3_SUB_INPLACE(state->w->player->pos, fwd);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        VEC3_ADD_INPLACE(&state->w->player->pos, right);
+        VEC3_ADD_INPLACE(state->w->player->pos, right);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        VEC3_SUB_INPLACE(&state->w->player->pos, right);
+        VEC3_SUB_INPLACE(state->w->player->pos, right);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        VEC3_ADD_INPLACE(&state->w->player->pos, up);
+        VEC3_ADD_INPLACE(state->w->player->pos, up);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        VEC3_SUB_INPLACE(&state->w->player->pos, up);
+        VEC3_SUB_INPLACE(state->w->player->pos, up);
 }

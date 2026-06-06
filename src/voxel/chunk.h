@@ -40,8 +40,6 @@ static inline bool chunkpos_eq(ChunkPos a, ChunkPos b)
 
 MAP_DECLARE(ChunkPos, ChunkPtr, chunkpos_hash, chunkpos_eq);
 
-VECTOR_DECLARE(Face);
-
 static inline VEC3(i64) chunk_local_to_world(VEC3(i64) chunk_pos, VEC3(u8) local)
 {
     return (VEC3(i64)){
@@ -53,6 +51,5 @@ static inline VEC3(i64) chunk_local_to_world(VEC3(i64) chunk_pos, VEC3(u8) local
 
 Chunk* create_empty_chunk(VEC3(i64) pos);
 Chunk* create_random_chunk(i64 x, i64 y, i64 z);
-VECTOR(Face)
-chunk_to_faces(Chunk* chunk, MAP(ChunkPos, ChunkPtr) * chunks, VECTOR(Face) face_instances);
+void chunk_to_faces(Chunk* chunk, MAP(ChunkPos, ChunkPtr) * chunks, Face* buf, size_t* count);
 const Block* chunk_get(const Chunk* chunk, VEC3(u8) pos);

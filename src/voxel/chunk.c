@@ -42,10 +42,9 @@ static bool chunk_is_in_bound(VEC3(u8) pos)
     return pos.x < CHUNK_SIZE && pos.y < CHUNK_SIZE && pos.z < CHUNK_SIZE;
 }
 
-VECTOR(Face)
-chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) face_instances)
+void chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, Face* buf, size_t* count)
 {
-    c->face_start_index = face_instances.size;
+    c->face_start_index = *count;
     c->face_count = 0;
 
     static const VEC3(i64) dirs[6] = {
@@ -88,16 +87,12 @@ chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) face_instance
                             continue;
                     }
 
-                    Face face = (Face){
+                    buf[(*count)++] = (Face){
                         .face_id = f,
                         .texture_id = face_texture_resolve(&BlockFaces[b->type][f], 0, 0, 0),
                         .pos = VEC3_CAST(i32, chunk_local_to_world(c->pos, (VEC3(u8)){ x, y, z })),
                     };
-
-                    VECTOR_PUSH_BACK(face_instances, face);
-                    c->face_count += 1;
+                    c->face_count++;
                 }
             }
-
-    return face_instances;
 }
