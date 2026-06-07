@@ -43,6 +43,8 @@ void world_integrate_results(World* w)
     {
         if (w->gpu_face_count + r.faces.size > MAX_FACE_COUNT)
         {
+            fprintf(stderr, "face buffer full: %zu / %zu faces used\n",
+                    w->gpu_face_count, MAX_FACE_COUNT);
             VECTOR_FREE(r.faces);
             continue;
         }

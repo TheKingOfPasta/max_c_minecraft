@@ -9,7 +9,7 @@
 #include "face.h"
 
 #define CHUNK_SIZE 16
-#define INSTANCE_MAX (CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE * 6)
+#define CHUNK_SHIFT 4
 
 typedef struct
 {

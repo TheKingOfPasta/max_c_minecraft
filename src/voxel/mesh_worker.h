@@ -6,9 +6,6 @@
 #include "utils/vec3.h"
 #include "voxel/chunk.h"
 
-#define SLAB_QUEUE_CAP 64
-#define RESULT_QUEUE_CAP 4096
-
 typedef struct
 {
     VEC3(i64) from;
@@ -21,17 +18,16 @@ typedef struct
     VECTOR(Face) faces;
 } MWMeshResult;
 
+VECTOR_DECLARE(MWSlabJob);
+VECTOR_DECLARE(MWMeshResult);
+
 typedef struct MeshWorker
 {
-    MWSlabJob slab_jobs[SLAB_QUEUE_CAP];
-    int slab_head;
-    int slab_tail;
+    VECTOR(MWSlabJob) slab_jobs;
     pthread_mutex_t slab_mutex;
     pthread_cond_t slab_cond;
 
-    MWMeshResult results[RESULT_QUEUE_CAP];
-    int res_head;
-    int res_tail;
+    VECTOR(MWMeshResult) results;
     pthread_mutex_t res_mutex;
 
     MAP(ChunkPos, ChunkPtr) chunks;

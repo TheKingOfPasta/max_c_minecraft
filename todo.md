@@ -46,18 +46,16 @@
 Memory allocator chunks
 
 - Optimizations
-    - [ ] minimize data transfer CPU <=> GPU
+    - minimize data transfer CPU <=> GPU
         - [ ] Face instances : Pack every face instance into a 32 bit number : 5 * 3 bit for pos, 3 bit ? for the face orientation,  the rest for the block type
         - [ ] replace current malloc+glBufferSubData with a mapped buffer (GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT), eliminating the CPU copy on every border gen
             - [ ] upgrade glad : 4.3 -> 4.4
         - [ ] make draw instance buffer a glBudderSubData
-    - [ ] Frustrum culling
-    - [ ] Face culling CPU wise
+        - [ ] Greedy meshing
+    - [X] Frustrum culling
+    - [ ] Binary meshing
+    - [ ] Face Orientation culling CPU wise
     - [ ] LOD
-
-Add Fabrizium
-
 
 
 Chunks aren't editable
-

@@ -50,7 +50,7 @@ static const int faceVerts[6][4][3] = {
 
 static inline bool is_world_block_solid(VEC3(i32) wpos, MAP(ChunkPos, ChunkPtr) * w)
 {
-    VEC3(i64) ch_pos = VEC3_CAST(i64, VEC3_RBS(wpos, 4));
+    VEC3(i64) ch_pos = VEC3_CAST(i64, VEC3_RBS(wpos, CHUNK_SHIFT));
     ChunkPtr* p = MAP_GET_T(ChunkPos, ChunkPtr, *w, ch_pos);
     if (!p)
         return false;
