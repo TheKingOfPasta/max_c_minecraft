@@ -4,17 +4,18 @@
 #include <stdlib.h>
 
 #include "opengl/tracy.h"
+#include "utils/container.h"
 #include "utils/vec3.h"
 #include "voxel/chunk.h"
 #include "voxel/terrain_gen/gen.h"
 
-static void add_chunk_if_missing(MeshWorker* mw, VEC3(i64) pos)
+static void add_chunk_if_missing(MeshWorker* mw, VEC3(i64) pos, VECTOR(ChunkPtr)* chunks)
 {
     if (MAP_GET_T(ChunkPos, ChunkPtr, mw->chunks, pos))
         return;
     Chunk* c = create_empty_chunk(pos);
-    gen_terrain(42, c);
     MAP_INSERT_T(ChunkPos, ChunkPtr, mw->chunks, pos, c);
+    VECTOR_PUSH_BACK(*chunks, c);
 }
 
 static void process_slab(MeshWorker* mw, VEC3(i64) from, VEC3(i64) to)
@@ -24,10 +25,19 @@ static void process_slab(MeshWorker* mw, VEC3(i64) from, VEC3(i64) to)
     TracyZone(ctx_terrain, "terrain_gen");
     VEC3(i64) efrom = VEC3_SUB(from, VEC3_SPLAT(i64, 1));
     VEC3(i64) eto = VEC3_ADD(to, VEC3_SPLAT(i64, 1));
+
+    VECTOR(ChunkPtr) vec;
+    VECTOR_INIT(vec);
+
     for (i64 z = efrom.z; z <= eto.z; z++)
         for (i64 y = efrom.y; y <= eto.y; y++)
             for (i64 x = efrom.x; x <= eto.x; x++)
-                add_chunk_if_missing(mw, (VEC3(i64)){ x, y, z });
+                add_chunk_if_missing(mw, (VEC3(i64)){ x, y, z }, &vec);
+
+#pragma omp parallel for
+    for (u64 i = 0; i < vec.size; i++)
+        gen_terrain(42, vec.data[i]);
+
     TracyZoneEnd(ctx_terrain);
 
     TracyZone(ctx_mesh, "mesh_slab");
