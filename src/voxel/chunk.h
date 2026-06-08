@@ -8,8 +8,8 @@
 #include "block.h"
 #include "face.h"
 
-#define CHUNK_SIZE 16
-#define CHUNK_SHIFT 4
+#define CHUNK_SIZE 32
+#define CHUNK_SHIFT 5
 
 typedef struct
 {
@@ -50,6 +50,7 @@ static inline VEC3(i64) chunk_local_to_world(VEC3(i64) chunk_pos, VEC3(u8) local
     };
 }
 
+#define CHUNK_IDX(x, y, z) ((z) * CHUNK_SIZE * CHUNK_SIZE + (y) * CHUNK_SIZE + (x))
 Chunk* create_empty_chunk(VEC3(i64) pos);
 Chunk* create_random_chunk(i64 x, i64 y, i64 z);
 void chunk_to_faces(Chunk* chunk, MAP(ChunkPos, ChunkPtr) * chunks, VECTOR(Face) * buf);

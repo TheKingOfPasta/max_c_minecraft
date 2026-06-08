@@ -6,8 +6,6 @@
 #include "opengl/tracy.h"
 #include "utils/vec3.h"
 
-#define CHUNK_IDX(x, y, z) ((z) * CHUNK_SIZE * CHUNK_SIZE + (y) * CHUNK_SIZE + (x))
-
 Chunk* create_empty_chunk(VEC3(i64) pos)
 {
     Chunk* c = calloc(1, sizeof(Chunk));
