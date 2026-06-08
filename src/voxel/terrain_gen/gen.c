@@ -1,5 +1,7 @@
 #include "gen.h"
 
+#include <stdio.h>
+
 #include "noise.h"
 #include "opengl/tracy.h"
 #include "utils/vec3.h"
@@ -41,12 +43,53 @@ static inline float trilinear(const NoiseGrid grid, VEC3(i32) gi, VEC3(float) t)
     return lerp(lerp(a, b, t.y), lerp(c, d, t.y), t.z);
 }
 
-static inline BlockType compute_block(NoiseGrid grid, VEC3(i32) lpos)
+static inline bool compute_solid(const NoiseGrid grid, VEC3(i32) lpos)
 {
     VEC3(i32) gi = VEC3_DIV(lpos, NOISE_STEP);
     VEC3(float) t = VEC3_MUL(VEC3_CAST(float, VEC3_MOD(lpos, NOISE_STEP)), 1.0f / NOISE_STEP);
-    float density = trilinear(grid, gi, t);
-    return density > 0.8f ? BLK_DIRT : BLK_AIR;
+    return trilinear(grid, gi, t) > 0.8f;
+}
+
+static inline BlockType paint_block(i64 seed, VEC3(i64) wpos, int depth)
+{
+    depth += 2 * noise2d(seed, VEC3_CAST(float, wpos), 1);
+
+    if (depth <= 1)
+        return BLK_GRASS;
+    if (depth <= 3)
+        return BLK_DIRT;
+    float var =
+        noise3d(seed ^ 0x5A3C1B9FL, VEC3_CAST(float, wpos), (VEC3(float)){ 32.0f, 32.0f, 32.0f });
+    if (var > 0.85f)
+        return BLK_GRAVEL;
+    if (var < 0.15f)
+        return BLK_DARKSTONE;
+    return BLK_STONE;
+}
+
+static void paint_terrain(i64 seed, VEC3(i64) origin, Chunk* c)
+{
+    for (int x = 0; x < CHUNK_SIZE; x++)
+        for (int z = 0; z < CHUNK_SIZE; z++)
+        {
+            bool top_solid = c->blocks[CHUNK_IDX(x, CHUNK_SIZE - 1, z)].type != BLK_AIR;
+            int depth = top_solid ? 100 : -1;
+
+            for (int y = CHUNK_SIZE - 1; y >= 0; y--)
+            {
+                Block* b = &c->blocks[CHUNK_IDX(x, y, z)];
+                if (b->type == BLK_AIR)
+                    continue;
+
+                if (depth < 0)
+                    depth = 0;
+                else
+                    depth++;
+
+                VEC3(i64) wpos = VEC3_ADD(origin, ((VEC3(i64)){ x, y, z }));
+                b->type = paint_block(seed, wpos, depth);
+            }
+        }
 }
 
 void gen_terrain(i64 seed, Chunk* c)
@@ -61,11 +104,11 @@ void gen_terrain(i64 seed, Chunk* c)
     for (int z = 0; z < CHUNK_SIZE; z++)
         for (int y = 0; y < CHUNK_SIZE; y++)
             for (int x = 0; x < CHUNK_SIZE; x++)
-            {
-                VEC3(i32) lpos = { x, y, z };
+                c->blocks[CHUNK_IDX(x, y, z)] = (Block){
+                    .type = compute_solid(grid, (VEC3(i32)){ x, y, z }) ? BLK_STONE : BLK_AIR,
+                };
 
-                c->blocks[CHUNK_IDX(x, y, z)] = (Block){ .type = compute_block(grid, lpos) };
-            }
+    paint_terrain(seed, origin, c);
 
     TracyZoneEnd(ctx);
 }
