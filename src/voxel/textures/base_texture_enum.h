@@ -1,4 +1,4 @@
-// auto-generated from ../../../assets/block_textures the 2026-06-05
+// auto-generated from ../../../assets/block_textures the 2026-06-08
 #pragma once
 
 typedef enum BaseTextureEnum
@@ -7,6 +7,7 @@ typedef enum BaseTextureEnum
     TEX_APP_CONTROLLER,
     TEX_BORDER_ACTIVE,
     TEX_BORDER_INACTIVE,
+    TEX_DARKSTONE,
     TEX_DIRT,
     TEX_FOLIAGE,
     TEX_GRASS,
@@ -23,6 +24,6 @@ typedef enum BaseTextureEnum
     TEX_STONE,
 } BaseTextureEnum;
 
-#define TEXTURE_COUNT 18
+#define TEXTURE_COUNT 19
 
 extern const char* TexturePaths[TEXTURE_COUNT];

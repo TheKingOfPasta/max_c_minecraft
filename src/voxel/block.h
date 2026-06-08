@@ -10,6 +10,7 @@ typedef enum BlockType : uint16_t
     BLK_GRASS,
     BLK_DIRT,
     BLK_STONE,
+    BLK_DARKSTONE,
     BLK_OAK,
     BLK_FOLIAGE,
     BLK_SAND,

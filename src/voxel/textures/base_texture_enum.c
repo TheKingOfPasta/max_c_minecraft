@@ -1,4 +1,4 @@
-// auto-generated source from ../../../assets/block_textures the 2026-06-05
+// auto-generated source from ../../../assets/block_textures the 2026-06-08
 #include "base_texture_enum.h"
 
 // clang-format off
@@ -7,6 +7,7 @@ const char* TexturePaths[TEXTURE_COUNT] = {
     [TEX_APP_CONTROLLER] = "assets/block_textures/app_controller.PNG",
     [TEX_BORDER_ACTIVE] = "assets/block_textures/border_active.PNG",
     [TEX_BORDER_INACTIVE] = "assets/block_textures/border_inactive.PNG",
+    [TEX_DARKSTONE] = "assets/block_textures/darkstone.PNG",
     [TEX_DIRT] = "assets/block_textures/dirt.PNG",
     [TEX_FOLIAGE] = "assets/block_textures/foliage.PNG",
     [TEX_GRASS] = "assets/block_textures/grass.PNG",
