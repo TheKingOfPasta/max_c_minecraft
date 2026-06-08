@@ -4,12 +4,12 @@
 #include <stdlib.h>
 
 #include "opengl/tracy.h"
-#include "utils/container.h"
 #include "utils/vec3.h"
 #include "voxel/chunk.h"
-#include "voxel/terrain_gen/gen.h"
+#include "voxel/generation/mesh_gen.h"
+#include "voxel/generation/terrain_gen/gen.h"
 
-static void add_chunk_if_missing(MeshWorker* mw, VEC3(i64) pos, VECTOR(ChunkPtr)* chunks)
+static void add_chunk_if_missing(MeshWorker* mw, VEC3(i64) pos, VECTOR(ChunkPtr) * chunks)
 {
     if (MAP_GET_T(ChunkPos, ChunkPtr, mw->chunks, pos))
         return;

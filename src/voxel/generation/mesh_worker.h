@@ -5,6 +5,7 @@
 
 #include "utils/vec3.h"
 #include "voxel/chunk.h"
+#include "voxel/face.h"
 
 typedef struct
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <utils/container.h>
-#include <utils/vec3.h>
+#include "utils/container.h"
+#include "utils/vec3.h"
 
 typedef struct
 {

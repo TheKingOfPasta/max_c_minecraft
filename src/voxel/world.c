@@ -9,9 +9,8 @@
 
 #include "opengl/tracy.h"
 #include "utils/vec3.h"
-#include "voxel/chunk.h"
 #include "voxel/face.h"
-#include "voxel/mesh_worker.h"
+#include "voxel/generation/mesh_worker.h"
 
 World init_world(void)
 {
@@ -43,8 +42,8 @@ void world_integrate_results(World* w)
     {
         if (w->gpu_face_count + r.faces.size > MAX_FACE_COUNT)
         {
-            fprintf(stderr, "face buffer full: %zu / %zu faces used\n",
-                    w->gpu_face_count, MAX_FACE_COUNT);
+            fprintf(stderr, "face buffer full: %zu / %zu faces used\n", w->gpu_face_count,
+                    MAX_FACE_COUNT);
             VECTOR_FREE(r.faces);
             continue;
         }
