@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stddef.h>
-#include <stdint.h>
 #include <utils/container.h>
 #include <utils/vec3.h>
 
@@ -12,7 +11,7 @@
 
 typedef struct
 {
-    VEC3(i64) pos;
+    VEC3(i32) pos;
 
     bool meshed;
 
@@ -22,14 +21,12 @@ typedef struct
     Block blocks[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
 } Chunk;
 
-typedef VEC3(i64) ChunkPos;
+typedef VEC3(i32) ChunkPos;
 typedef Chunk* ChunkPtr;
 
-static inline size_t chunkpos_hash(ChunkPos p)
+static inline u32 chunkpos_hash(ChunkPos p)
 {
-    uint64_t h = (uint64_t)(uint32_t)p.x * 73856093u ^ (uint64_t)(uint32_t)p.y * 19349663u
-        ^ (uint64_t)(uint32_t)p.z * 83492791u;
-    return (size_t)h;
+    return (u32)p.x * 73856093u ^ (u32)p.y * 19349663u ^ (u32)p.z * 83492791u;
 }
 
 static inline bool chunkpos_eq(ChunkPos a, ChunkPos b)
@@ -40,9 +37,9 @@ static inline bool chunkpos_eq(ChunkPos a, ChunkPos b)
 MAP_DECLARE(ChunkPos, ChunkPtr, chunkpos_hash, chunkpos_eq);
 VECTOR_DECLARE(ChunkPtr);
 
-static inline VEC3(i64) chunk_local_to_world(VEC3(i64) chunk_pos, VEC3(u8) local)
+static inline VEC3(i32) chunk_local_to_world(VEC3(i32) chunk_pos, VEC3(u8) local)
 {
-    return (VEC3(i64)){
+    return (VEC3(i32)){
         .x = chunk_pos.x * CHUNK_SIZE + local.x,
         .y = chunk_pos.y * CHUNK_SIZE + local.y,
         .z = chunk_pos.z * CHUNK_SIZE + local.z,
@@ -51,5 +48,5 @@ static inline VEC3(i64) chunk_local_to_world(VEC3(i64) chunk_pos, VEC3(u8) local
 
 #define CHUNK_IDX(x, y, z) ((z) * CHUNK_SIZE * CHUNK_SIZE + (y) * CHUNK_SIZE + (x))
 
-Chunk* create_empty_chunk(VEC3(i64) pos);
+Chunk* create_empty_chunk(VEC3(i32) pos);
 const Block* chunk_get(const Chunk* chunk, VEC3(u8) pos);

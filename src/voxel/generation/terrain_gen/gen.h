@@ -3,4 +3,4 @@
 #include "utils/type.h"
 #include "voxel/chunk.h"
 
-void gen_terrain(i64 seed, Chunk* c);
+void gen_terrain(i32 seed, Chunk* c);

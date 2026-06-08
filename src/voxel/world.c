@@ -58,45 +58,45 @@ void world_integrate_results(World* w)
     TracyZoneEnd(ctx);
 }
 
-static void submit_border(World* w, VEC3(i64) ppos, VEC3(i64) diff)
+static void submit_border(World* w, VEC3(i32) ppos, VEC3(i32) diff)
 {
-    VEC3(i64) lo = VEC3_SUB(ppos, VEC3_SPLAT(i64, LOADED_CHUNK_DISTANCE));
-    VEC3(i64) hi = VEC3_ADD(ppos, VEC3_SPLAT(i64, LOADED_CHUNK_DISTANCE));
+    VEC3(i32) lo = VEC3_SUB(ppos, VEC3_SPLAT(i32, LOADED_CHUNK_DISTANCE));
+    VEC3(i32) hi = VEC3_ADD(ppos, VEC3_SPLAT(i32, LOADED_CHUNK_DISTANCE));
 
     if (diff.x > 0)
         mesh_worker_submit(
-            w->worker, (VEC3(i64)){ ppos.x - diff.x + LOADED_CHUNK_DISTANCE + 1, lo.y, lo.z }, hi);
+            w->worker, (VEC3(i32)){ ppos.x - diff.x + LOADED_CHUNK_DISTANCE + 1, lo.y, lo.z }, hi);
     else if (diff.x < 0)
         mesh_worker_submit(w->worker, lo,
-                           (VEC3(i64)){ ppos.x - diff.x - LOADED_CHUNK_DISTANCE - 1, hi.y, hi.z });
+                           (VEC3(i32)){ ppos.x - diff.x - LOADED_CHUNK_DISTANCE - 1, hi.y, hi.z });
 
     if (diff.y > 0)
         mesh_worker_submit(
-            w->worker, (VEC3(i64)){ lo.x, ppos.y - diff.y + LOADED_CHUNK_DISTANCE + 1, lo.z }, hi);
+            w->worker, (VEC3(i32)){ lo.x, ppos.y - diff.y + LOADED_CHUNK_DISTANCE + 1, lo.z }, hi);
     else if (diff.y < 0)
         mesh_worker_submit(w->worker, lo,
-                           (VEC3(i64)){ hi.x, ppos.y - diff.y - LOADED_CHUNK_DISTANCE - 1, hi.z });
+                           (VEC3(i32)){ hi.x, ppos.y - diff.y - LOADED_CHUNK_DISTANCE - 1, hi.z });
 
     if (diff.z > 0)
         mesh_worker_submit(
-            w->worker, (VEC3(i64)){ lo.x, lo.y, ppos.z - diff.z + LOADED_CHUNK_DISTANCE + 1 }, hi);
+            w->worker, (VEC3(i32)){ lo.x, lo.y, ppos.z - diff.z + LOADED_CHUNK_DISTANCE + 1 }, hi);
     else if (diff.z < 0)
         mesh_worker_submit(w->worker, lo,
-                           (VEC3(i64)){ hi.x, hi.y, ppos.z - diff.z - LOADED_CHUNK_DISTANCE - 1 });
+                           (VEC3(i32)){ hi.x, hi.y, ppos.z - diff.z - LOADED_CHUNK_DISTANCE - 1 });
 }
 
 void generate_new_chunks(World* w, [[maybe_unused]] GLuint vao, size_t* face_count)
 {
     TracyZone(ctx, "generate_chunks");
 
-    VEC3(i64)
+    VEC3(i32)
     playerpos = {
-        (i64)floorf(w->player->pos.x / CHUNK_SIZE),
-        (i64)floorf(w->player->pos.y / CHUNK_SIZE),
-        (i64)floorf(w->player->pos.z / CHUNK_SIZE),
+        (i32)floorf(w->player->pos.x / CHUNK_SIZE),
+        (i32)floorf(w->player->pos.y / CHUNK_SIZE),
+        (i32)floorf(w->player->pos.z / CHUNK_SIZE),
     };
 
-    VEC3(i64) diff = VEC3_SUB(playerpos, w->old_chunk_pos);
+    VEC3(i32) diff = VEC3_SUB(playerpos, w->old_chunk_pos);
 
     if (w->initialized && diff.x == 0 && diff.y == 0 && diff.z == 0)
     {
@@ -108,8 +108,8 @@ void generate_new_chunks(World* w, [[maybe_unused]] GLuint vao, size_t* face_cou
     {
         TracyZone(ctx_init, "initial_gen");
         printf("Generating all surrounding chunks\n");
-        VEC3(i64) lo = VEC3_SUB(playerpos, VEC3_SPLAT(i64, LOADED_CHUNK_DISTANCE));
-        VEC3(i64) hi = VEC3_ADD(playerpos, VEC3_SPLAT(i64, LOADED_CHUNK_DISTANCE));
+        VEC3(i32) lo = VEC3_SUB(playerpos, VEC3_SPLAT(i32, LOADED_CHUNK_DISTANCE));
+        VEC3(i32) hi = VEC3_ADD(playerpos, VEC3_SPLAT(i32, LOADED_CHUNK_DISTANCE));
         mesh_worker_submit(w->worker, lo, hi);
         w->initialized = true;
         TracyZoneEnd(ctx_init);

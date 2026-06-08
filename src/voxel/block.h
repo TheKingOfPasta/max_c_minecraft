@@ -1,10 +1,9 @@
 #pragma once
 
-#include <stdint.h>
-
+#include "utils/type.h"
 #include "voxel/textures/face_texture.h"
 
-typedef enum BlockType : uint16_t
+typedef enum BlockType : u8
 {
     BLK_AIR = 0,
     BLK_GRASS,

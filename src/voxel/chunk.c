@@ -5,7 +5,7 @@
 #include "block.h"
 #include "utils/vec3.h"
 
-Chunk* create_empty_chunk(VEC3(i64) pos)
+Chunk* create_empty_chunk(VEC3(i32) pos)
 {
     Chunk* c = calloc(1, sizeof(Chunk));
     c->pos = pos;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 // glad before
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
@@ -30,7 +30,7 @@ typedef struct
     MeshWorker* worker;
     bool initialized;
     Player* player;
-    VEC3(i64) old_chunk_pos;
+    VEC3(i32) old_chunk_pos;
     VECTOR(ChunkPtr) meshed_chunks;
     VECTOR(DrawInstance) drawn_chunks;
     GLuint face_vbo;

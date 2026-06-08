@@ -9,7 +9,7 @@
 #include "voxel/generation/mesh_gen.h"
 #include "voxel/generation/terrain_gen/gen.h"
 
-static void add_chunk_if_missing(MeshWorker* mw, VEC3(i64) pos, VECTOR(ChunkPtr) * chunks)
+static void add_chunk_if_missing(MeshWorker* mw, VEC3(i32) pos, VECTOR(ChunkPtr) * chunks)
 {
     if (MAP_GET_T(ChunkPos, ChunkPtr, mw->chunks, pos))
         return;
@@ -18,21 +18,21 @@ static void add_chunk_if_missing(MeshWorker* mw, VEC3(i64) pos, VECTOR(ChunkPtr)
     VECTOR_PUSH_BACK(*chunks, c);
 }
 
-static void process_slab(MeshWorker* mw, VEC3(i64) from, VEC3(i64) to)
+static void process_slab(MeshWorker* mw, VEC3(i32) from, VEC3(i32) to)
 {
     TracyZone(ctx_slab, "process_slab");
 
     TracyZone(ctx_terrain, "terrain_gen");
-    VEC3(i64) efrom = VEC3_SUB(from, VEC3_SPLAT(i64, 1));
-    VEC3(i64) eto = VEC3_ADD(to, VEC3_SPLAT(i64, 1));
+    VEC3(i32) efrom = VEC3_SUB(from, VEC3_SPLAT(i64, 1));
+    VEC3(i32) eto = VEC3_ADD(to, VEC3_SPLAT(i64, 1));
 
     VECTOR(ChunkPtr) vec;
     VECTOR_INIT(vec);
 
-    for (i64 z = efrom.z; z <= eto.z; z++)
-        for (i64 y = efrom.y; y <= eto.y; y++)
-            for (i64 x = efrom.x; x <= eto.x; x++)
-                add_chunk_if_missing(mw, (VEC3(i64)){ x, y, z }, &vec);
+    for (i32 z = efrom.z; z <= eto.z; z++)
+        for (i32 y = efrom.y; y <= eto.y; y++)
+            for (i32 x = efrom.x; x <= eto.x; x++)
+                add_chunk_if_missing(mw, (VEC3(i32)){ x, y, z }, &vec);
 
 #pragma omp parallel for
     for (u64 i = 0; i < vec.size; i++)
@@ -41,11 +41,11 @@ static void process_slab(MeshWorker* mw, VEC3(i64) from, VEC3(i64) to)
     TracyZoneEnd(ctx_terrain);
 
     TracyZone(ctx_mesh, "mesh_slab");
-    for (i64 z = from.z; z <= to.z; z++)
-        for (i64 y = from.y; y <= to.y; y++)
-            for (i64 x = from.x; x <= to.x; x++)
+    for (i32 z = from.z; z <= to.z; z++)
+        for (i32 y = from.y; y <= to.y; y++)
+            for (i32 x = from.x; x <= to.x; x++)
             {
-                VEC3(i64) pos = { x, y, z };
+                VEC3(i32) pos = { x, y, z };
                 Chunk* c = *MAP_GET_T(ChunkPos, ChunkPtr, mw->chunks, pos);
                 if (c->meshed)
                     continue;
@@ -124,7 +124,7 @@ void mesh_worker_destroy(MeshWorker* mw)
     free(mw);
 }
 
-void mesh_worker_submit(MeshWorker* mw, VEC3(i64) from, VEC3(i64) to)
+void mesh_worker_submit(MeshWorker* mw, VEC3(i32) from, VEC3(i32) to)
 {
     pthread_mutex_lock(&mw->slab_mutex);
     if (!VECTOR_PUSH_BACK(mw->slab_jobs, ((MWSlabJob){ from, to })))

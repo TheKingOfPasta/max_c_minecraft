@@ -18,7 +18,7 @@ static const int faceVerts[6][4][3] = {
 
 static inline bool is_world_block_solid(VEC3(i32) wpos, MAP(ChunkPos, ChunkPtr) * w)
 {
-    VEC3(i64) ch_pos = VEC3_CAST(i64, VEC3_RBS(wpos, CHUNK_SHIFT));
+    VEC3(i32) ch_pos = VEC3_RBS(wpos, CHUNK_SHIFT);
     ChunkPtr* p = MAP_GET_T(ChunkPos, ChunkPtr, *w, ch_pos);
     if (!p)
         return false;
@@ -119,7 +119,7 @@ void chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) * buf)
     Chunk* nb[6];
     for (int f = 0; f < 6; f++)
     {
-        ChunkPtr* p = MAP_GET_T(ChunkPos, ChunkPtr, *w, VEC3_ADD(c->pos, VEC3_CAST(i64, dirs[f])));
+        ChunkPtr* p = MAP_GET_T(ChunkPos, ChunkPtr, *w, VEC3_ADD(c->pos, dirs[f]));
         nb[f] = p ? *p : NULL;
     }
 

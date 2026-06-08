@@ -4,6 +4,7 @@
 
 #include "noise.h"
 #include "opengl/tracy.h"
+#include "utils/type.h"
 #include "utils/vec3.h"
 #include "voxel/block.h"
 #include "voxel/chunk.h"
@@ -16,14 +17,14 @@ _Static_assert(CHUNK_SIZE % NOISE_STEP == 0, "NOISE_STEP must divide CHUNK_SIZE"
 
 typedef float NoiseGrid[NOISE_GRID][NOISE_GRID][NOISE_GRID];
 
-static inline void compute_sample_grid(i64 seed, VEC3(i64) origin, NoiseGrid grid)
+static inline void compute_sample_grid(i32 seed, VEC3(i32) origin, NoiseGrid grid)
 {
     for (int gz = 0; gz < NOISE_GRID; gz++)
         for (int gy = 0; gy < NOISE_GRID; gy++)
             for (int gx = 0; gx < NOISE_GRID; gx++)
             {
                 VEC3(i32) g = { gx, gy, gz };
-                VEC3(i64) gpos = VEC3_ADD(origin, VEC3_MUL(g, NOISE_STEP));
+                VEC3(i32) gpos = VEC3_ADD(origin, VEC3_MUL(g, NOISE_STEP));
                 grid[gz][gy][gx] =
                     noise3d(seed, VEC3_CAST(float, gpos), (VEC3(float)){ 256.0f, 64.0f, 256.0f });
             }
@@ -50,7 +51,7 @@ static inline bool compute_solid(const NoiseGrid grid, VEC3(i32) lpos)
     return trilinear(grid, gi, t) > 0.8f;
 }
 
-static inline BlockType paint_block(i64 seed, VEC3(i64) wpos, int depth)
+static inline BlockType paint_block(i32 seed, VEC3(i32) wpos, int depth)
 {
     depth += 2 * noise2d(seed, VEC3_CAST(float, wpos), 1);
 
@@ -67,15 +68,15 @@ static inline BlockType paint_block(i64 seed, VEC3(i64) wpos, int depth)
     return BLK_STONE;
 }
 
-static void paint_terrain(i64 seed, VEC3(i64) origin, Chunk* c)
+static void paint_terrain(i32 seed, VEC3(i32) origin, Chunk* c)
 {
-    for (int x = 0; x < CHUNK_SIZE; x++)
-        for (int z = 0; z < CHUNK_SIZE; z++)
+    for (i32 x = 0; x < CHUNK_SIZE; x++)
+        for (i32 z = 0; z < CHUNK_SIZE; z++)
         {
             bool top_solid = c->blocks[CHUNK_IDX(x, CHUNK_SIZE - 1, z)].type != BLK_AIR;
             int depth = top_solid ? 100 : -1;
 
-            for (int y = CHUNK_SIZE - 1; y >= 0; y--)
+            for (i32 y = CHUNK_SIZE - 1; y >= 0; y--)
             {
                 Block* b = &c->blocks[CHUNK_IDX(x, y, z)];
                 if (b->type == BLK_AIR)
@@ -86,17 +87,17 @@ static void paint_terrain(i64 seed, VEC3(i64) origin, Chunk* c)
                 else
                     depth++;
 
-                VEC3(i64) wpos = VEC3_ADD(origin, ((VEC3(i64)){ x, y, z }));
+                VEC3(i32) wpos = VEC3_ADD(origin, ((VEC3(i32)){ x, y, z }));
                 b->type = paint_block(seed, wpos, depth);
             }
         }
 }
 
-void gen_terrain(i64 seed, Chunk* c)
+void gen_terrain(i32 seed, Chunk* c)
 {
     TracyZone(ctx, "gen_terrain");
 
-    VEC3(i64) origin = VEC3_MUL(c->pos, CHUNK_SIZE);
+    VEC3(i32) origin = VEC3_MUL(c->pos, CHUNK_SIZE);
 
     NoiseGrid grid;
     compute_sample_grid(seed, origin, grid);

@@ -9,8 +9,8 @@
 
 typedef struct
 {
-    VEC3(i64) from;
-    VEC3(i64) to;
+    VEC3(i32) from;
+    VEC3(i32) to;
 } MWSlabJob;
 
 typedef struct
@@ -39,5 +39,5 @@ typedef struct MeshWorker
 
 MeshWorker* mesh_worker_create(void);
 void mesh_worker_destroy(MeshWorker* mw);
-void mesh_worker_submit(MeshWorker* mw, VEC3(i64) from, VEC3(i64) to);
+void mesh_worker_submit(MeshWorker* mw, VEC3(i32) from, VEC3(i32) to);
 bool mesh_worker_pop_result(MeshWorker* mw, MWMeshResult* out);
