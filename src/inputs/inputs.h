@@ -9,7 +9,7 @@
 #include "voxel/world.h"
 
 #define CAM_PITCH_LIMIT 1.55334f
-#define CAM_SPEED 40.0f
+#define CAM_SPEED 100.0f
 #define CAM_SENSITIVITY 0.0025f
 
 typedef struct AppState
