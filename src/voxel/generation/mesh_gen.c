@@ -46,7 +46,7 @@ static inline void set_bit(i64* n, int b)
 
 static inline void set_border_bits(i64 faces[BLOCK_COUNT][6][CHUNK_SIZE * CHUNK_SIZE], Chunk* c, BlockType b, int dir, int x, int y, MAP(ChunkPos, ChunkPtr)* w)
 {
-    static VEC3(i32) dirs[6] = {
+    static VEC3(i32) dirs[3] = {
         { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 },
     };
 
