@@ -22,5 +22,10 @@ GLuint describe_faces(GLuint cube_vao)
     glEnableVertexAttribArray(2);
     glVertexAttribDivisor(2, 1);
 
+    glVertexAttribIPointer(3, 3, GL_INT, sizeof(Face), (void*)offsetof(Face, scale));
+
+    glEnableVertexAttribArray(3);
+    glVertexAttribDivisor(3, 1);
+
     return instances_vbo;
 }

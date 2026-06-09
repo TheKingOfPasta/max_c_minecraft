@@ -9,6 +9,7 @@ layout(binding = 0) uniform UniformBufferObject {
 layout(location = 0) in int face;
 layout(location = 1) in int   inTextureId;
 layout(location = 2) in ivec3 pos;
+layout(location = 3) in ivec3 scale;
 
 layout(location = 0) out vec3 fragTexCoord;
 layout(location = 1) out float fragAO;
@@ -44,7 +45,7 @@ void main() {
     int ao_val = (face >> (4 + v * 2)) & 3;
     fragAO = mix(0.4, 1.0, float(ao_val) / 3.0);
 
-    ivec3 worldPos = pos + faceOffsets[dir][v];
+    ivec3 worldPos = pos + ivec3(faceOffsets[dir][v].x * scale.x, faceOffsets[dir][v].y * scale.y, faceOffsets[dir][v].z * scale.z);
     gl_Position  = ubo.proj * ubo.view * ubo.model * ivec4(worldPos, 1.0);
     fragTexCoord = vec3(faceUVs[dir][v], float(inTextureId));
 }

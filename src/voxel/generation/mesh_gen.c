@@ -1,6 +1,9 @@
 #include "mesh_gen.h"
 
 #include "opengl/tracy.h"
+#include "utils/container.h"
+#include "voxel/block.h"
+#include "voxel/chunk.h"
 
 static const VEC3(i32) dirs[6] = {
     { 1, 0, 0 }, { -1, 0, 0 }, { 0, 1, 0 }, { 0, -1, 0 }, { 0, 0, 1 }, { 0, 0, -1 },
@@ -62,24 +65,25 @@ static inline int vertex_ao(int f, int v, VEC3(i32) wpos, MAP(ChunkPos, ChunkPtr
     return 3 - s1 - s2 - co;
 }
 
-static inline void emit_face(int f, const Block* b, VEC3(i32) wpos, VECTOR(Face) * buf,
-                             MAP(ChunkPos, ChunkPtr) * w)
+static inline void emit_face(int f, const BlockType b, VEC3(i32) wpos, VECTOR(Face) * buf,
+                             [[maybe_unused]] MAP(ChunkPos, ChunkPtr) * w, VEC3(i32) scale)
 {
-    int ao0 = vertex_ao(f, 0, wpos, w);
+    /*int ao0 = vertex_ao(f, 0, wpos, w);
     int ao1 = vertex_ao(f, 1, wpos, w);
     int ao2 = vertex_ao(f, 2, wpos, w);
     int ao3 = vertex_ao(f, 3, wpos, w);
-    int flip = (ao0 + ao2 < ao1 + ao3) ? 1 : 0;
+    int flip = (ao0 + ao2 < ao1 + ao3) ? 1 : 0;*/
     VECTOR_PUSH_BACK(
         *buf,
         ((Face){
-            .face_id = f | (flip << 3) | (ao0 << 4) | (ao1 << 6) | (ao2 << 8) | (ao3 << 10),
-            .texture_id = face_texture_resolve(&BlockFaces[b->type][f], 0, 0, 0),
+            .face_id = f,
+            .texture_id = face_texture_resolve(&BlockFaces[b][f], 0, 0, 0),
             .pos = wpos,
+            .scale = scale,
         }));
 }
 
-static inline void border_block_faces(VEC3(i32) lpos, Chunk* c, Chunk** neighbours, VEC3(i32) base,
+/*static inline void border_block_faces(VEC3(i32) lpos, Chunk* c, Chunk** neighbours, VEC3(i32) base,
                                       VECTOR(Face) * buf, MAP(ChunkPos, ChunkPtr) * w)
 {
     const Block* b = &c->blocks[CHUNK_IDX(lpos.x, lpos.y, lpos.z)];
@@ -110,22 +114,107 @@ static inline void border_block_faces(VEC3(i32) lpos, Chunk* c, Chunk** neighbou
 
         emit_face(f, b, wpos, buf, w);
     }
+}*/
+
+static inline VEC3(i32) get_dir_vector(int x, int y, int dir, int empty_val)
+{
+    switch (dir)
+    {
+        case 0:
+            return (VEC3(i32)){ empty_val, x, y };
+        case 1:
+            return (VEC3(i32)){ x, empty_val, y };
+        default:
+            return (VEC3(i32)){ x, y, empty_val };
+    }
 }
 
-void chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) * buf)
+#include <stdio.h>
+
+void chunk_to_faces(Chunk* c, [[maybe_unused]] MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) * buf)
 {
     TracyZone(ctx, "chunk_to_face");
 
-    Chunk* nb[6];
-    for (int f = 0; f < 6; f++)
-    {
-        ChunkPtr* p = MAP_GET_T(ChunkPos, ChunkPtr, *w, VEC3_ADD(c->pos, dirs[f]));
-        nb[f] = p ? *p : NULL;
-    }
-
     VEC3(i32) base = VEC3_CAST(i32, VEC3_MUL(c->pos, CHUNK_SIZE));
 
-    for (int z = 1; z < CHUNK_SIZE - 1; z++)
+    i32 faces[BLOCK_COUNT][3][CHUNK_SIZE * CHUNK_SIZE] = { 0 };
+
+    for (BlockType b = 0; b < BLOCK_COUNT; b++)
+        if (b != BLK_AIR)
+            for (int dir = 0; dir < 3; dir++)
+                for (int y = 0; y < CHUNK_SIZE; y++)
+                for (int x = 0; x < CHUNK_SIZE; x++)
+                {
+                    /*VEC3(i32) vec_dir_prev = get_dir_vector(x, y, dir, 0);
+                    VEC3(i32) prev_pos = VEC3_SUB(vec_dir_prev, dirs[dir]);
+                    ChunkPtr* chunk_prev = MAP_GET_T(ChunkPos, ChunkPtr, (*w), (VEC3_SUB(c->pos, dirs[dir])));
+
+                    if (chunk_prev && (*chunk_prev)->blocks[CHUNK_IDX(prev_pos.x, prev_pos.y, prev_pos.z)].type == b)
+                        faces[b][dir][CHUNK_IDX_2D(x, y)] |= 1 << 0;
+
+                    VEC3(i32) vec_dir_next = get_dir_vector(x, y, dir, CHUNK_SIZE - 1);
+                    VEC3(i32) next_pos = VEC3_ADD(vec_dir_next, dirs[dir]);
+                    ChunkPtr* chunk_next = MAP_GET_T(ChunkPos, ChunkPtr, (*w), (VEC3_ADD(c->pos, dirs[dir])));
+
+                    if (chunk_next && (*chunk_next)->blocks[CHUNK_IDX(next_pos.x, next_pos.y, next_pos.z)].type == b)
+                        faces[b][dir][CHUNK_IDX_2D(x, y)] |= 1lu << (CHUNK_SIZE + 1);*/
+
+                    for (int k = 0; k < CHUNK_SIZE; k++)
+                    {
+                        VEC3(i32) vec_dir = get_dir_vector(x, y, dir, k);
+                        //VEC3(i32) vec_dir_next = get_dir_vector(x, y, dir, k + 1);
+
+                        if (c->blocks[CHUNK_IDX(vec_dir.x, vec_dir.y, vec_dir.z)].type == b)
+                            faces[b][dir][CHUNK_IDX_2D(x, y)] |= (1 << k);
+                    }
+                }
+
+    for (BlockType b = 0; b < BLOCK_COUNT; b++)
+    if (b != BLK_AIR)
+    {
+        for (int dir = 0; dir < 3; dir++)
+        for (int depth = 0; depth < CHUNK_SIZE; depth++)
+        for (int v = 0; v < CHUNK_SIZE; v++)
+        for (int u = 0; u < CHUNK_SIZE; u++)
+        {
+            VEC3(i32) pos = get_dir_vector(u, v, dir, depth);
+            if (c->blocks[CHUNK_IDX(pos.x, pos.y, pos.z)].type != b)
+                continue;
+            if (!(faces[b][dir][CHUNK_IDX_2D(u, v)] & (1 << depth)))
+                continue;
+
+            int w = 1;
+            for (; u + w < CHUNK_SIZE; w++)
+                if (!(faces[b][dir][CHUNK_IDX_2D(u + w, v)] & (1 << depth)))
+                    break;
+
+            int h = 1;
+            for (; v + h < CHUNK_SIZE; h++)
+            {
+                bool valid = true;
+                for (int k = 0; k < w && valid; k++)
+                    if (!(faces[b][dir][CHUNK_IDX_2D(u + k, v + h)] & (1 << depth)))
+                        valid = false;
+                if (!valid)
+                    break;
+            }
+
+            for (int dv = 0; dv < h; dv++)
+            for (int du = 0; du < w; du++)
+                faces[b][dir][CHUNK_IDX_2D(u + du, v + dv)] &= ~(1 << depth);
+
+            VEC3(i32) scale = get_dir_vector(w, h, dir, 1);
+            Face f = {
+                .face_id = dir * 2,
+                .pos = VEC3_ADD(pos, base),
+                .texture_id = face_texture_resolve(&BlockFaces[b][2 * dir], 0, 0, 0),
+                .scale = scale,
+            };
+            VECTOR_PUSH_BACK(*buf, f);
+        }
+    }
+
+    /*for (int z = 1; z < CHUNK_SIZE - 1; z++)
         for (int y = 1; y < CHUNK_SIZE - 1; y++)
             for (int x = 1; x < CHUNK_SIZE - 1; x++)
             {
@@ -161,7 +250,7 @@ void chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) * buf)
         {
             border_block_faces((VEC3(i32)){ x, y, 0 }, c, nb, base, buf, w);
             border_block_faces((VEC3(i32)){ x, y, CHUNK_SIZE - 1 }, c, nb, base, buf, w);
-        }
+        }*/
 
     TracyZoneEnd(ctx);
 }

@@ -47,6 +47,7 @@ static inline VEC3(i32) chunk_local_to_world(VEC3(i32) chunk_pos, VEC3(u8) local
 }
 
 #define CHUNK_IDX(x, y, z) ((z) * CHUNK_SIZE * CHUNK_SIZE + (y) * CHUNK_SIZE + (x))
+#define CHUNK_IDX_2D(x, y) ((y) * CHUNK_SIZE + (x))
 
 Chunk* create_empty_chunk(VEC3(i32) pos);
 const Block* chunk_get(const Chunk* chunk, VEC3(u8) pos);

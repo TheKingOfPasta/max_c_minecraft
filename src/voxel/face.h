@@ -8,6 +8,7 @@ typedef struct
     int texture_id;
     int face_id;
     VEC3(i32) pos;
+    VEC3(i32) scale;
 } Face;
 
 VECTOR_DECLARE(Face);
