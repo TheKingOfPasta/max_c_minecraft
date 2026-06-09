@@ -10,7 +10,7 @@
 #include "voxel/chunk.h"
 #include "voxel/player.h"
 
-#define LOADED_CHUNK_DISTANCE 20
+#define LOADED_CHUNK_DISTANCE 5
 #define MAX_FACE_COUNT ((size_t)1 << 23)
 
 typedef struct

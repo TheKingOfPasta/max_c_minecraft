@@ -116,20 +116,30 @@ static inline void emit_face(int f, const BlockType b, VEC3(i32) wpos, VECTOR(Fa
     }
 }*/
 
-static inline VEC3(i32) get_dir_vector(int x, int y, int dir, int empty_val)
+static inline VEC3(i32) get_dir_vector(int x, int y, int dir, int val, int offset)
 {
+    offset = -offset;
+
+    if ((dir % 2 == 0 && (val - offset < 0 || val - offset >= CHUNK_SIZE)) ||
+        (dir % 2 == 1 && (val + offset < 0 || val + offset >= CHUNK_SIZE)))
+        return (VEC3(i32)){ -1, -1, -1 };
+
     switch (dir)
     {
         case 0:
-            return (VEC3(i32)){ empty_val, x, y };
+            return (VEC3(i32)){ val - offset, x, y };
         case 1:
-            return (VEC3(i32)){ x, empty_val, y };
+            return (VEC3(i32)){ val + offset, x, y };
+        case 2:
+            return (VEC3(i32)){ x, val - offset, y };
+        case 3:
+            return (VEC3(i32)){ x, val + offset, y };
+        case 4:
+            return (VEC3(i32)){ x, y, val - offset };
         default:
-            return (VEC3(i32)){ x, y, empty_val };
+            return (VEC3(i32)){ x, y, val + offset };
     }
 }
-
-#include <stdio.h>
 
 void chunk_to_faces(Chunk* c, [[maybe_unused]] MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) * buf)
 {
@@ -137,11 +147,11 @@ void chunk_to_faces(Chunk* c, [[maybe_unused]] MAP(ChunkPos, ChunkPtr) * w, VECT
 
     VEC3(i32) base = VEC3_CAST(i32, VEC3_MUL(c->pos, CHUNK_SIZE));
 
-    i32 faces[BLOCK_COUNT][3][CHUNK_SIZE * CHUNK_SIZE] = { 0 };
+    i32 faces[BLOCK_COUNT][6][CHUNK_SIZE * CHUNK_SIZE] = { 0 };
 
     for (BlockType b = 0; b < BLOCK_COUNT; b++)
         if (b != BLK_AIR)
-            for (int dir = 0; dir < 3; dir++)
+            for (int dir = 0; dir < 6; dir++)
                 for (int y = 0; y < CHUNK_SIZE; y++)
                 for (int x = 0; x < CHUNK_SIZE; x++)
                 {
@@ -161,23 +171,26 @@ void chunk_to_faces(Chunk* c, [[maybe_unused]] MAP(ChunkPos, ChunkPtr) * w, VECT
 
                     for (int k = 0; k < CHUNK_SIZE; k++)
                     {
-                        VEC3(i32) vec_dir = get_dir_vector(x, y, dir, k);
-                        //VEC3(i32) vec_dir_next = get_dir_vector(x, y, dir, k + 1);
+                        VEC3(i32) vec_dir = get_dir_vector(x, y, dir, k, 0);
+                        VEC3(i32) vec_dir_next = get_dir_vector(x, y, dir, k, 1);
 
-                        if (c->blocks[CHUNK_IDX(vec_dir.x, vec_dir.y, vec_dir.z)].type == b)
+                        if (c->blocks[CHUNK_IDX(vec_dir.x, vec_dir.y, vec_dir.z)].type == b &&
+                            (vec_dir_next.x == -1 || c->blocks[CHUNK_IDX(vec_dir_next.x, vec_dir_next.y, vec_dir_next.z)].type == BLK_AIR))
+                        {
                             faces[b][dir][CHUNK_IDX_2D(x, y)] |= (1 << k);
+                        }
                     }
                 }
 
     for (BlockType b = 0; b < BLOCK_COUNT; b++)
     if (b != BLK_AIR)
     {
-        for (int dir = 0; dir < 3; dir++)
+        for (int dir = 0; dir < 6; dir++)
         for (int depth = 0; depth < CHUNK_SIZE; depth++)
         for (int v = 0; v < CHUNK_SIZE; v++)
         for (int u = 0; u < CHUNK_SIZE; u++)
         {
-            VEC3(i32) pos = get_dir_vector(u, v, dir, depth);
+            VEC3(i32) pos = get_dir_vector(u, v, dir, depth, 0);
             if (c->blocks[CHUNK_IDX(pos.x, pos.y, pos.z)].type != b)
                 continue;
             if (!(faces[b][dir][CHUNK_IDX_2D(u, v)] & (1 << depth)))
@@ -195,6 +208,7 @@ void chunk_to_faces(Chunk* c, [[maybe_unused]] MAP(ChunkPos, ChunkPtr) * w, VECT
                 for (int k = 0; k < w && valid; k++)
                     if (!(faces[b][dir][CHUNK_IDX_2D(u + k, v + h)] & (1 << depth)))
                         valid = false;
+
                 if (!valid)
                     break;
             }
@@ -203,11 +217,11 @@ void chunk_to_faces(Chunk* c, [[maybe_unused]] MAP(ChunkPos, ChunkPtr) * w, VECT
             for (int du = 0; du < w; du++)
                 faces[b][dir][CHUNK_IDX_2D(u + du, v + dv)] &= ~(1 << depth);
 
-            VEC3(i32) scale = get_dir_vector(w, h, dir, 1);
+            VEC3(i32) scale = get_dir_vector(w, h, dir, 1, 0);
             Face f = {
-                .face_id = dir * 2,
+                .face_id = dir,
                 .pos = VEC3_ADD(pos, base),
-                .texture_id = face_texture_resolve(&BlockFaces[b][2 * dir], 0, 0, 0),
+                .texture_id = face_texture_resolve(&BlockFaces[b][dir], 0, 0, 0),
                 .scale = scale,
             };
             VECTOR_PUSH_BACK(*buf, f);

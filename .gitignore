@@ -4,6 +4,8 @@ max_c_minecraft_profile
 trace.tracy
 flame.svg
 
+*.swp
+*.swo
 
 max_c_minecraft
 .envrc
