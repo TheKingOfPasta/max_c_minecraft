@@ -68,7 +68,7 @@ static inline BlockType paint_block(i32 seed, VEC3(i32) wpos, int depth)
 
     if (depth <= 1)
         return BLK_GRASS;
-    if (depth <= 3)
+    if (depth <= 2)
         return BLK_DIRT;
     float var =
         noise3d(seed ^ 0x5A3C1B9FL, VEC3_CAST(float, wpos), (VEC3(float)){ 32.0f, 32.0f, 32.0f });
@@ -85,7 +85,7 @@ static void paint_terrain(i32 seed, VEC3(i32) origin, Chunk* c)
         for (i32 z = 0; z < CHUNK_SIZE; z++)
         {
             bool top_solid = c->blocks[CHUNK_IDX(x, CHUNK_SIZE - 1, z)].type != BLK_AIR;
-            int depth = top_solid ? 100 : -1;
+            int depth = top_solid ? -1 : -1;
 
             for (i32 y = CHUNK_SIZE - 1; y >= 0; y--)
             {
