@@ -46,7 +46,11 @@ static inline void set_bit(i64* n, int b)
 
 static inline void set_border_bits(i64 faces[BLOCK_COUNT][6][CHUNK_SIZE * CHUNK_SIZE], Chunk* c, BlockType b, int dir, int x, int y, MAP(ChunkPos, ChunkPtr)* w)
 {
-    VEC3(i32) prev_chunk_pos = VEC3_SUB(c->pos, (get_dir_vector(0, 0, dir, 1, 0)));
+    static VEC3(i32) dirs[6] = {
+        { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 },
+    };
+
+    VEC3(i32) prev_chunk_pos = VEC3_SUB(c->pos, dirs[dir / 2]);
     ChunkPtr* prev_chunk = MAP_GET_T(ChunkPos, ChunkPtr, *w, prev_chunk_pos);
     if (prev_chunk != NULL)
     {
@@ -55,7 +59,7 @@ static inline void set_border_bits(i64 faces[BLOCK_COUNT][6][CHUNK_SIZE * CHUNK_
             set_bit(&faces[b][dir][CHUNK_IDX_2D(x, y)], 0);
     }
 
-    VEC3(i32) next_chunk_pos = VEC3_ADD(c->pos, (get_dir_vector(0, 0, dir, 1, 0)));
+    VEC3(i32) next_chunk_pos = VEC3_ADD(c->pos, dirs[dir / 2]);
     ChunkPtr* next_chunk = MAP_GET_T(ChunkPos, ChunkPtr, *w, next_chunk_pos);
     if (next_chunk != NULL)
     {
@@ -111,12 +115,12 @@ static void build_faces(i64 faces[BLOCK_COUNT][6][CHUNK_SIZE * CHUNK_SIZE], Chun
             VEC3(i32) pos = get_dir_vector(u, v, dir, depth, 0);
             if (c->blocks[CHUNK_IDX(pos.x, pos.y, pos.z)].type != b)
                 continue;
-            if (!(faces[b][dir][CHUNK_IDX_2D(u, v)] & (1lu << (depth + 1))))
+            if (is_bit_unset(faces[b][dir][CHUNK_IDX_2D(u, v)], depth + 1))
                 continue;
 
             int w = 1;
             for (; u + w < CHUNK_SIZE; w++)
-                if (!(faces[b][dir][CHUNK_IDX_2D(u + w, v)] & (1lu << (depth + 1))))
+                if (is_bit_unset(faces[b][dir][CHUNK_IDX_2D(u + w, v)], depth + 1))
                     break;
 
             int h = 1;
@@ -124,7 +128,7 @@ static void build_faces(i64 faces[BLOCK_COUNT][6][CHUNK_SIZE * CHUNK_SIZE], Chun
             {
                 bool valid = true;
                 for (int k = 0; k < w && valid; k++)
-                    if (!(faces[b][dir][CHUNK_IDX_2D(u + k, v + h)] & (1lu << (depth + 1))))
+                    if (is_bit_unset(faces[b][dir][CHUNK_IDX_2D(u + k, v + h)], depth + 1))
                         valid = false;
 
                 if (!valid)
