@@ -30,37 +30,50 @@ static inline VEC3(i32) get_dir_vector(int x, int y, int dir, int val, int offse
     }
 }
 
-void chunk_to_faces(Chunk* c, [[maybe_unused]] MAP(ChunkPos, ChunkPtr) * w, VECTOR(Face) * buf)
+static inline bool is_bit_set(i64 n, int b)
 {
-    TracyZone(ctx, "chunk_to_face");
+    return n & (1lu << b);
+}
+static inline bool is_bit_unset(i64 n, int b)
+{
+    return !is_bit_set(n, b);
+}
 
-    VEC3(i32) base = VEC3_CAST(i32, VEC3_MUL(c->pos, CHUNK_SIZE));
+static inline void set_bit(i64* n, int b)
+{
+    (*n) |= (1lu << b);
+}
 
-    i64 faces[BLOCK_COUNT][6][CHUNK_SIZE * CHUNK_SIZE] = { 0 };
+static inline void set_border_bits(i64 faces[BLOCK_COUNT][6][CHUNK_SIZE * CHUNK_SIZE], Chunk* c, BlockType b, int dir, int x, int y, MAP(ChunkPos, ChunkPtr)* w)
+{
+    VEC3(i32) prev_chunk_pos = VEC3_SUB(c->pos, (get_dir_vector(0, 0, dir, 1, 0)));
+    ChunkPtr* prev_chunk = MAP_GET_T(ChunkPos, ChunkPtr, *w, prev_chunk_pos);
+    if (prev_chunk != NULL)
+    {
+        VEC3(i32) dir_prev = get_dir_vector(x, y, dir, CHUNK_SIZE - 1, 0);
+        if ((*prev_chunk)->blocks[CHUNK_IDX(dir_prev.x, dir_prev.y, dir_prev.z)].type != BLK_AIR)
+            set_bit(&faces[b][dir][CHUNK_IDX_2D(x, y)], 0);
+    }
 
+    VEC3(i32) next_chunk_pos = VEC3_ADD(c->pos, (get_dir_vector(0, 0, dir, 1, 0)));
+    ChunkPtr* next_chunk = MAP_GET_T(ChunkPos, ChunkPtr, *w, next_chunk_pos);
+    if (next_chunk != NULL)
+    {
+        VEC3(i32) dir_next = get_dir_vector(x, y, dir, 0, 0);
+        if ((*next_chunk)->blocks[CHUNK_IDX(dir_next.x, dir_next.y, dir_next.z)].type != BLK_AIR)
+            set_bit(&faces[b][dir][CHUNK_IDX_2D(x, y)], CHUNK_SIZE + 1);
+    }
+}
+
+static void build_bit_masks(i64 faces[BLOCK_COUNT][6][CHUNK_SIZE * CHUNK_SIZE], Chunk* c, MAP(ChunkPos, ChunkPtr)* w)
+{
     for (BlockType b = 0; b < BLOCK_COUNT; b++)
         if (b != BLK_AIR)
             for (int dir = 0; dir < 6; dir++)
                 for (int y = 0; y < CHUNK_SIZE; y++)
                 for (int x = 0; x < CHUNK_SIZE; x++)
                 {
-                    VEC3(i32) prev_chunk_pos = VEC3_SUB(c->pos, (get_dir_vector(0, 0, dir, 1, 0)));
-                    ChunkPtr* prev_chunk = MAP_GET_T(ChunkPos, ChunkPtr, *w, prev_chunk_pos);
-                    if (prev_chunk != NULL)
-                    {
-                        VEC3(i32) dir_prev = get_dir_vector(x, y, dir, CHUNK_SIZE - 1, 0);
-                        if ((*prev_chunk)->blocks[CHUNK_IDX(dir_prev.x, dir_prev.y, dir_prev.z)].type == b)
-                            faces[b][dir][CHUNK_IDX_2D(x, y)] |= 1lu << 0;
-                    }
-
-                    VEC3(i32) next_chunk_pos = VEC3_ADD(c->pos, (get_dir_vector(0, 0, dir, 1, 0)));
-                    ChunkPtr* next_chunk = MAP_GET_T(ChunkPos, ChunkPtr, *w, next_chunk_pos);
-                    if (next_chunk != NULL)
-                    {
-                        VEC3(i32) dir_next = get_dir_vector(x, y, dir, 0, 0);
-                        if ((*next_chunk)->blocks[CHUNK_IDX(dir_next.x, dir_next.y, dir_next.z)].type == b)
-                            faces[b][dir][CHUNK_IDX_2D(x, y)] |= 1lu << (CHUNK_SIZE + 1);
-                    }
+                    set_border_bits(faces, c, b, dir, x, y, w);
 
                     for (int k = 0; k < CHUNK_SIZE; k++)
                     {
@@ -71,16 +84,21 @@ void chunk_to_faces(Chunk* c, [[maybe_unused]] MAP(ChunkPos, ChunkPtr) * w, VECT
                         {
                             if (vec_dir_next.x == -1)
                             {
-                                if (dir % 2 == 1 && !(faces[b][dir][CHUNK_IDX_2D(x, y)] & (1lu << 0)))
-                                    faces[b][dir][CHUNK_IDX_2D(x, y)] |= (1lu << (k + 1));
-                                else if (dir % 2 == 0 && !(faces[b][dir][CHUNK_IDX_2D(x, y)] & (1lu << (CHUNK_SIZE + 1))))
-                                    faces[b][dir][CHUNK_IDX_2D(x, y)] |= (1lu << (k + 1));
+                                if (dir % 2 == 1 && is_bit_unset(faces[b][dir][CHUNK_IDX_2D(x, y)], 0))
+                                    set_bit(&faces[b][dir][CHUNK_IDX_2D(x, y)], k + 1);
+                                else if (dir % 2 == 0 && is_bit_unset(faces[b][dir][CHUNK_IDX_2D(x, y)], CHUNK_SIZE + 1))
+                                    set_bit(&faces[b][dir][CHUNK_IDX_2D(x, y)], k + 1);
                             }
                             else if (c->blocks[CHUNK_IDX(vec_dir_next.x, vec_dir_next.y, vec_dir_next.z)].type == BLK_AIR)
-                                faces[b][dir][CHUNK_IDX_2D(x, y)] |= (1lu << (k + 1));
+                                set_bit(&faces[b][dir][CHUNK_IDX_2D(x, y)], k + 1);
                         }
                     }
                 }
+}
+
+static void build_faces(i64 faces[BLOCK_COUNT][6][CHUNK_SIZE * CHUNK_SIZE], Chunk* c, VECTOR(Face)* buf)
+{
+    VEC3(i32) base = VEC3_CAST(i32, VEC3_MUL(c->pos, CHUNK_SIZE));
 
     for (BlockType b = 0; b < BLOCK_COUNT; b++)
     if (b != BLK_AIR)
@@ -127,44 +145,17 @@ void chunk_to_faces(Chunk* c, [[maybe_unused]] MAP(ChunkPos, ChunkPtr) * w, VECT
             VECTOR_PUSH_BACK(*buf, f);
         }
     }
+}
 
-    /*for (int z = 1; z < CHUNK_SIZE - 1; z++)
-        for (int y = 1; y < CHUNK_SIZE - 1; y++)
-            for (int x = 1; x < CHUNK_SIZE - 1; x++)
-            {
-                const Block* b = &c->blocks[CHUNK_IDX(x, y, z)];
-                if (b->type == BLK_AIR)
-                    continue;
+void chunk_to_faces(Chunk* c, MAP(ChunkPos, ChunkPtr)* w, VECTOR(Face)* buf)
+{
+    TracyZone(ctx, "chunk_to_face");
 
-                VEC3(i32) lpos = { x, y, z };
-                VEC3(i32) wpos = VEC3_ADD(base, lpos);
-                for (int f = 0; f < 6; f++)
-                {
-                    VEC3(i32) nv = VEC3_ADD(lpos, dirs[f]);
-                    if (c->blocks[CHUNK_IDX(nv.x, nv.y, nv.z)].type != BLK_AIR)
-                        continue;
-                    emit_face(f, b, wpos, buf, w);
-                }
-            }
+    i64 faces[BLOCK_COUNT][6][CHUNK_SIZE * CHUNK_SIZE] = { 0 };
 
-    for (int z = 0; z < CHUNK_SIZE; z++)
-        for (int y = 0; y < CHUNK_SIZE; y++)
-        {
-            border_block_faces((VEC3(i32)){ 0, y, z }, c, nb, base, buf, w);
-            border_block_faces((VEC3(i32)){ CHUNK_SIZE - 1, y, z }, c, nb, base, buf, w);
-        }
-    for (int z = 0; z < CHUNK_SIZE; z++)
-        for (int x = 1; x < CHUNK_SIZE - 1; x++)
-        {
-            border_block_faces((VEC3(i32)){ x, 0, z }, c, nb, base, buf, w);
-            border_block_faces((VEC3(i32)){ x, CHUNK_SIZE - 1, z }, c, nb, base, buf, w);
-        }
-    for (int y = 1; y < CHUNK_SIZE - 1; y++)
-        for (int x = 1; x < CHUNK_SIZE - 1; x++)
-        {
-            border_block_faces((VEC3(i32)){ x, y, 0 }, c, nb, base, buf, w);
-            border_block_faces((VEC3(i32)){ x, y, CHUNK_SIZE - 1 }, c, nb, base, buf, w);
-        }*/
+    build_bit_masks(faces, c, w);
+
+    build_faces(faces, c, buf);
 
     TracyZoneEnd(ctx);
 }
