@@ -5,15 +5,11 @@
 #include "voxel/block.h"
 #include "voxel/chunk.h"
 
-static const VEC3(i32) dirs[6] = {
-    { 1, 0, 0 }, { -1, 0, 0 }, { 0, 1, 0 }, { 0, -1, 0 }, { 0, 0, 1 }, { 0, 0, -1 },
-};
-
 static inline VEC3(i32) get_dir_vector(int x, int y, int dir, int val, int offset)
 {
     if ((dir % 2 == 0 && val + offset >= CHUNK_SIZE) ||
         (dir % 2 == 1 && val - offset < 0))
-        return (VEC3(i32)){ -1, -1, offset };
+        return (VEC3(i32)){ -1, -1, -1 };
 
     offset = -offset;
 
@@ -48,22 +44,23 @@ void chunk_to_faces(Chunk* c, [[maybe_unused]] MAP(ChunkPos, ChunkPtr) * w, VECT
                 for (int y = 0; y < CHUNK_SIZE; y++)
                 for (int x = 0; x < CHUNK_SIZE; x++)
                 {
-                    VEC3(i32) vec_dir_prev = get_dir_vector(x, y, dir, 0, 0);
-                    VEC3(i32) prev_pos = VEC3_SUB(vec_dir_prev, dirs[dir]);
-                    ChunkPtr* chunk_prev = MAP_GET_T(ChunkPos, ChunkPtr, (*w), (VEC3_SUB(c->pos, dirs[dir])));
+                    VEC3(i32) prev_chunk_pos = VEC3_SUB(c->pos, (get_dir_vector(0, 0, dir, 1, 0)));
+                    ChunkPtr* prev_chunk = MAP_GET_T(ChunkPos, ChunkPtr, *w, prev_chunk_pos);
+                    if (prev_chunk != NULL)
+                    {
+                        VEC3(i32) dir_prev = get_dir_vector(x, y, dir, CHUNK_SIZE - 1, 0);
+                        if ((*prev_chunk)->blocks[CHUNK_IDX(dir_prev.x, dir_prev.y, dir_prev.z)].type == b)
+                            faces[b][dir][CHUNK_IDX_2D(x, y)] |= 1lu << 0;
+                    }
 
-                    if (chunk_prev && (*chunk_prev)->blocks[CHUNK_IDX(prev_pos.x, prev_pos.y, prev_pos.z)].type == b)
-                        faces[b][dir][CHUNK_IDX_2D(x, y)] |= 1 << 0;
-
-                    VEC3(i32) vec_dir_next = get_dir_vector(x, y, dir, CHUNK_SIZE - 1, 0);
-                    VEC3(i32) next_pos = VEC3_ADD(vec_dir_next, dirs[dir]);
-                    ChunkPtr* chunk_next = MAP_GET_T(ChunkPos, ChunkPtr, (*w), (VEC3_ADD(c->pos, dirs[dir])));
-
-                    if (chunk_next && (*chunk_next)->blocks[CHUNK_IDX(next_pos.x, next_pos.y, next_pos.z)].type == b)
-                        faces[b][dir][CHUNK_IDX_2D(x, y)] |= 1lu << (CHUNK_SIZE + 1);
-
-                    faces[b][dir][CHUNK_IDX_2D(x, y)] |= 1lu << (CHUNK_SIZE + 1);
-                    faces[b][dir][CHUNK_IDX_2D(x, y)] |= 1lu << 0;
+                    VEC3(i32) next_chunk_pos = VEC3_ADD(c->pos, (get_dir_vector(0, 0, dir, 1, 0)));
+                    ChunkPtr* next_chunk = MAP_GET_T(ChunkPos, ChunkPtr, *w, next_chunk_pos);
+                    if (next_chunk != NULL)
+                    {
+                        VEC3(i32) dir_next = get_dir_vector(x, y, dir, 0, 0);
+                        if ((*next_chunk)->blocks[CHUNK_IDX(dir_next.x, dir_next.y, dir_next.z)].type == b)
+                            faces[b][dir][CHUNK_IDX_2D(x, y)] |= 1lu << (CHUNK_SIZE + 1);
+                    }
 
                     for (int k = 0; k < CHUNK_SIZE; k++)
                     {
@@ -74,9 +71,9 @@ void chunk_to_faces(Chunk* c, [[maybe_unused]] MAP(ChunkPos, ChunkPtr) * w, VECT
                         {
                             if (vec_dir_next.x == -1)
                             {
-                                if (vec_dir_next.y == -1 && (faces[b][dir][CHUNK_IDX_2D(x, y)] & (1lu << 0)))
+                                if (dir % 2 == 1 && !(faces[b][dir][CHUNK_IDX_2D(x, y)] & (1lu << 0)))
                                     faces[b][dir][CHUNK_IDX_2D(x, y)] |= (1lu << (k + 1));
-                                else if (vec_dir_next.y == 1 && (faces[b][dir][CHUNK_IDX_2D(x, y)] & (1lu << (CHUNK_SIZE + 1))))
+                                else if (dir % 2 == 0 && !(faces[b][dir][CHUNK_IDX_2D(x, y)] & (1lu << (CHUNK_SIZE + 1))))
                                     faces[b][dir][CHUNK_IDX_2D(x, y)] |= (1lu << (k + 1));
                             }
                             else if (c->blocks[CHUNK_IDX(vec_dir_next.x, vec_dir_next.y, vec_dir_next.z)].type == BLK_AIR)
