@@ -33,6 +33,15 @@ const ivec2 faceUVs[6][4] = {
     {ivec2(1,1), ivec2(1,0), ivec2(0,0), ivec2(0,1)}, // -Z
 };
 
+const ivec2 faceScaleDims[6] = {
+    ivec2(2, 1), // +X
+    ivec2(2, 1), // -X
+    ivec2(0, 2), // +Y
+    ivec2(0, 2), // -Y
+    ivec2(0, 1), // +Z
+    ivec2(0, 1), // -Z
+};
+
 const int quadNormal[6] = {0, 1, 2, 2, 3, 0};
 const int quadFlipped[6] = {1, 2, 3, 3, 0, 1};
 
@@ -45,7 +54,12 @@ void main() {
     int ao_val = (face >> (4 + v * 2)) & 3;
     fragAO = mix(0.4, 1.0, float(ao_val) / 3.0);
 
-    ivec3 worldPos = pos + ivec3(faceOffsets[dir][v].x * scale.x, faceOffsets[dir][v].y * scale.y, faceOffsets[dir][v].z * scale.z);
-    gl_Position  = ubo.proj * ubo.view * ubo.model * ivec4(worldPos, 1.0);
-    fragTexCoord = vec3(faceUVs[dir][v], float(inTextureId));
+    ivec3 worldPos = pos + ivec3(faceOffsets[dir][v].x * scale.x,
+                                 faceOffsets[dir][v].y * scale.y,
+                                 faceOffsets[dir][v].z * scale.z);
+    gl_Position = ubo.proj * ubo.view * ubo.model * ivec4(worldPos, 1.0);
+
+    ivec2 dims = faceScaleDims[dir];
+    vec2  uv   = vec2(faceUVs[dir][v]) * vec2(scale[dims.x], scale[dims.y]);
+    fragTexCoord = vec3(uv, float(inTextureId));
 }
