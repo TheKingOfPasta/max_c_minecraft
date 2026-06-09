@@ -21,7 +21,7 @@ static void init_mvp(void)
     mvp = calloc(1, sizeof(mvp_model));
     mat4_identity(mvp->model);
     mat4_identity(mvp->view);
-    mat4_perspective(mvp->proj, FOV_Y, (float)WIN_W / WIN_H, 0.1f, 1000.0f);
+    mat4_perspective(mvp->proj, FOV_Y, (float)WIN_W / WIN_H, 0.5f, 4000.0f);
 }
 
 static GLuint create_cube_vao(void)

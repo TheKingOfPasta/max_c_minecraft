@@ -9,6 +9,9 @@
 #include "voxel/generation/mesh_gen.h"
 #include "voxel/generation/terrain_gen/gen.h"
 
+#define TERRAIN_CHUNK_Y_MIN (BORDER_DOWN / CHUNK_SIZE - 1)
+#define TERRAIN_CHUNK_Y_MAX (BORDER_UP / CHUNK_SIZE)
+
 static void add_chunk_if_missing(MeshWorker* mw, VEC3(i32) pos, VECTOR(ChunkPtr) * chunks)
 {
     if (MAP_GET_T(ChunkPos, ChunkPtr, mw->chunks, pos))
@@ -20,11 +23,15 @@ static void add_chunk_if_missing(MeshWorker* mw, VEC3(i32) pos, VECTOR(ChunkPtr)
 
 static void process_slab(MeshWorker* mw, VEC3(i32) from, VEC3(i32) to)
 {
+    if (from.y < TERRAIN_CHUNK_Y_MIN) from.y = TERRAIN_CHUNK_Y_MIN;
+    if (to.y   > TERRAIN_CHUNK_Y_MAX) to.y   = TERRAIN_CHUNK_Y_MAX;
+    if (from.y > to.y) return;
+
     TracyZone(ctx_slab, "process_slab");
 
     TracyZone(ctx_terrain, "terrain_gen");
-    VEC3(i32) efrom = VEC3_SUB(from, VEC3_SPLAT(i64, 1));
-    VEC3(i32) eto = VEC3_ADD(to, VEC3_SPLAT(i64, 1));
+    VEC3(i32) efrom = VEC3_SUB(from, VEC3_SPLAT(i32, 1));
+    VEC3(i32) eto = VEC3_ADD(to, VEC3_SPLAT(i32, 1));
 
     VECTOR(ChunkPtr) vec;
     VECTOR_INIT(vec);
@@ -34,7 +41,7 @@ static void process_slab(MeshWorker* mw, VEC3(i32) from, VEC3(i32) to)
             for (i32 x = efrom.x; x <= eto.x; x++)
                 add_chunk_if_missing(mw, (VEC3(i32)){ x, y, z }, &vec);
 
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic, 4)
     for (u64 i = 0; i < vec.size; i++)
         gen_terrain(42, vec.data[i]);
 

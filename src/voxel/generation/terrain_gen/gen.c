@@ -1,7 +1,5 @@
 #include "gen.h"
 
-#include <stdio.h>
-
 #include "noise.h"
 #include "opengl/tracy.h"
 #include "utils/type.h"
@@ -9,7 +7,7 @@
 #include "voxel/block.h"
 #include "voxel/chunk.h"
 
-#define NOISE_STEP 16
+#define NOISE_STEP 32
 
 _Static_assert(CHUNK_SIZE % NOISE_STEP == 0, "NOISE_STEP must divide CHUNK_SIZE");
 
@@ -25,8 +23,21 @@ static inline void compute_sample_grid(i32 seed, VEC3(i32) origin, NoiseGrid gri
             {
                 VEC3(i32) g = { gx, gy, gz };
                 VEC3(i32) gpos = VEC3_ADD(origin, VEC3_MUL(g, NOISE_STEP));
+
+                float height_influence = 1;
+                if (gpos.y > BORDER_UP - BORDER_SMOOTH)
+                {
+                    height_influence = (float)(BORDER_UP - gpos.y) / (BORDER_SMOOTH);
+                }
+
+                if (gpos.y < BORDER_DOWN + BORDER_SMOOTH)
+                {
+                    height_influence = (float)(gpos.y - BORDER_DOWN) / (BORDER_SMOOTH);
+                }
+
                 grid[gz][gy][gx] =
-                    noise3d(seed, VEC3_CAST(float, gpos), (VEC3(float)){ 256.0f, 64.0f, 256.0f });
+                    noise3d(seed, VEC3_CAST(float, gpos), (VEC3(float)){ 256.0f, 64.0f, 256.0f })
+                    * height_influence;
             }
 }
 
@@ -95,9 +106,12 @@ static void paint_terrain(i32 seed, VEC3(i32) origin, Chunk* c)
 
 void gen_terrain(i32 seed, Chunk* c)
 {
-    TracyZone(ctx, "gen_terrain");
-
     VEC3(i32) origin = VEC3_MUL(c->pos, CHUNK_SIZE);
+
+    if (origin.y >= BORDER_UP || origin.y + CHUNK_SIZE <= BORDER_DOWN)
+        return;
+
+    TracyZone(ctx, "gen_terrain");
 
     NoiseGrid grid;
     compute_sample_grid(seed, origin, grid);
