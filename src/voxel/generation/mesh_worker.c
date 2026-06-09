@@ -9,6 +9,10 @@
 #include "voxel/generation/mesh_gen.h"
 #include "voxel/generation/terrain_gen/gen.h"
 
+#define TERRAIN_CHUNK_Y_MIN (BORDER_DOWN / CHUNK_SIZE - 1)
+#define TERRAIN_CHUNK_Y_MAX (BORDER_UP / CHUNK_SIZE)
+#include "voxel/generation/terrain_gen/tree_gen.h"
+
 static void add_chunk_if_missing(MeshWorker* mw, VEC3(i32) pos, VECTOR(ChunkPtr) * chunks)
 {
     if (MAP_GET_T(ChunkPos, ChunkPtr, mw->chunks, pos))
@@ -20,6 +24,10 @@ static void add_chunk_if_missing(MeshWorker* mw, VEC3(i32) pos, VECTOR(ChunkPtr)
 
 static void process_slab(MeshWorker* mw, VEC3(i32) from, VEC3(i32) to)
 {
+    if (from.y < TERRAIN_CHUNK_Y_MIN) from.y = TERRAIN_CHUNK_Y_MIN;
+    if (to.y   > TERRAIN_CHUNK_Y_MAX) to.y   = TERRAIN_CHUNK_Y_MAX;
+    if (from.y > to.y) return;
+
     TracyZone(ctx_slab, "process_slab");
 
     TracyZone(ctx_terrain, "terrain_gen");
