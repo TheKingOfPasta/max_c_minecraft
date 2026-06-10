@@ -51,8 +51,8 @@ void main() {
     int vi     = gl_VertexID % 6;
     int v      = (flip != 0) ? quadFlipped[vi] : quadNormal[vi];
 
-    int ao_val = (face >> (4 + v * 2)) & 3;
-    fragAO = mix(0.4, 1.0, float(ao_val) / 3.0);
+    const float dirBright[6] = float[6](0.8, 0.8, 1.0, 0.5, 0.75, 0.75);
+    fragAO = dirBright[dir];
 
     ivec3 worldPos = pos + ivec3(faceOffsets[dir][v].x * scale.x,
                                  faceOffsets[dir][v].y * scale.y,
