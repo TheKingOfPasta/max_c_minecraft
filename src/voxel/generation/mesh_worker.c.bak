@@ -8,7 +8,6 @@
 #include "voxel/chunk.h"
 #include "voxel/generation/mesh_gen.h"
 #include "voxel/generation/terrain_gen/gen.h"
-#include "voxel/generation/terrain_gen/tree_gen.h"
 
 #define TERRAIN_CHUNK_Y_MIN (BORDER_DOWN / CHUNK_SIZE - 1)
 #define TERRAIN_CHUNK_Y_MAX (BORDER_UP / CHUNK_SIZE)
@@ -47,17 +46,6 @@ static void process_slab(MeshWorker* mw, VEC3(i32) from, VEC3(i32) to)
         gen_terrain(42, vec.data[i]);
 
     TracyZoneEnd(ctx_terrain);
-
-    TracyZone(ctx_tree, "tree_gen");
-    for (i32 z = from.z; z <= to.z; z++)
-        for (i32 y = from.y; y <= to.y; y++)
-            for (i32 x = from.x; x <= to.x; x++)
-            {
-                VEC3(i32) pos = { x, y, z };
-                Chunk* c = *MAP_GET_T(ChunkPos, ChunkPtr, mw->chunks, pos);
-                gen_trees(42, c, &mw->chunks);
-            }
-    TracyZoneEnd(ctx_tree);
 
     TracyZone(ctx_mesh, "mesh_slab");
     for (i32 z = from.z; z <= to.z; z++)
